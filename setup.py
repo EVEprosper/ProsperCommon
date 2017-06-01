@@ -6,7 +6,7 @@ from setuptools.command.test import test as TestCommand
 from codecs import open
 
 HERE = path.abspath(path.dirname(__file__))
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __project_name__ = 'common'
 
 def hack_find_packages(include_str):
@@ -58,6 +58,7 @@ class PyTest(TestCommand):
         TestCommand.initialize_options(self)
         self.pytest_args = [
             'tests',
+            '-rx',
             '--cov=prosper/' + __project_name__,
             '--cov-report=term-missing'
         ]    #load defaults here
