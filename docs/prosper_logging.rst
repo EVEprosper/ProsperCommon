@@ -32,7 +32,7 @@ the ``LogBuilder`` can be extended with some other handlers if required.  Also, 
 Built-In Handlers
 =================
 
-configure_default_logger()
+`configure_default_logger()`_
 --------------------------
 
 .. code-block:: python
@@ -46,15 +46,15 @@ configure_default_logger()
         debug_mode:bool
     ):
 
-* ``log_freq``: `TimedRotatingFileHandler definition <https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler>`_
-* ``log_total``: how many log-periods to retain
-* ``log_level``: `Desired minimum log level <https://docs.python.org/3.5/library/logging.html#levels>`_
-* ``log_format``: `Python log formatter string <https://docs.python.org/3.5/library/logging.html#logrecord-attributes>`_
-* ``debug_mode``: unused at this time
+* **log_freq**: `TimedRotatingFileHandler definition <https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler>`_
+* **log_total**: how many log-periods to retain
+* **log_level**: `Desired minimum log level <https://docs.python.org/3.5/library/logging.html#levels>`_
+* **log_format**: `Python log formatter string <https://docs.python.org/3.5/library/logging.html#logrecord-attributes>`_
+* **debug_mode**: unused at this time
 
 This handler is loaded by default.  It can be reset by calling ``ProsperLogger().configure_default_logger(...)`` again.  **THIS SHOULD BE DONE AS EARLY AS POSSIBLE** can wipe out all other attached handlers.
 
-configure_debug_logger()
+`configure_debug_logger()`_
 ------------------------
 
 .. code-block:: python
@@ -66,13 +66,13 @@ configure_debug_logger()
         debug_mode:bool
     ):
 
-* ``log_level``: default = 'DEBUG' (print everything)
-* ``log_format``: default = ``ReportingFormats.STDOUT``
-* ``debug_mode``: unused
+* **log_level**: default = 'DEBUG' (print everything)
+* **log_format**: default = ``ReportingFormats.STDOUT``
+* **debug_mode**: unused
 
 For live debugging, report logging messages to standard out.  This can be attached by a `Plumbum.cli <http://plumbum.readthedocs.io/en/latest/cli.html>`_ for easy toggling between debug/production logging
 
-configure_discord_logger()
+`configure_discord_logger()`_
 --------------------------
 
 .. code-block:: python
@@ -86,15 +86,15 @@ configure_discord_logger()
         debug_mode:bool
     ):
 
-* ``discord_webhook``: `discord webhook url <https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)>`_
-* ``discord_recipients``: ``<@int>`` for alerting `users <https://discordapp.com/developers/docs/resources/user#user-object>`_/groups (see app developer console)
-* ``log_level``: default 'ERROR'
-* ``log_format``: default ``ReportingFormats.PRETTY_PRINT``
-* ``debug_mode``: unused
+* **discord_webhook**: `discord webhook url <https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks)>`_
+* **discord_recipients**: ``<@int>`` for alerting `users <https://discordapp.com/developers/docs/resources/user#user-object>`_/groups (see app developer console)
+* **log_level**: default 'ERROR'
+* **log_format**: default ``ReportingFormats.PRETTY_PRINT``
+* **debug_mode**: unused
 
 Live alerting is a useful tool.  ProsperCommon is loaded with a REST handler for pushing logging alerts to `discord webhooks <https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks>`_.  Any alerts above a given level will be pushed out to a discord channel along the webhook pipeline
 
-configure_slack_logger()
+`configure_slack_logger()`_
 ------------------------
 
 .. code-block:: python
@@ -107,10 +107,10 @@ configure_slack_logger()
         debug_mode:bool
     ):
 
-* ``slack_webhook``: `Slack webhook url <https://api.slack.com/apps>`_
-* ``log_level``: default 'ERROR'
-* ``log_format``: default ``ReportingFormats.PRETTY_PRINT``
-* ``debug_mode``: unused
+* **slack_webhook**: `Slack webhook url <https://api.slack.com/apps>`_
+* **log_level**: default 'ERROR'
+* **log_format**: default ``ReportingFormats.PRETTY_PRINT``
+* **debug_mode**: unused
 
 Similar to the Discord handler, the Slack handler works very similarly.  Just get a `webhook for slack <https://api.slack.com/apps>`_ and assign the appropriate channel scope.  
 
@@ -166,3 +166,8 @@ Instead we include some helpful baked-in formats for easy setup:
 .. code-block:: none
 
     [DEBUG:prosper_logging.py--<module>:185] my debug message
+
+.. _configure_default_logger(): source/common.html#common.prosper_logging.ProsperLogger.configure_default_logger
+.. _configure_debug_logger(): source/common.html#common.prosper_logging.ProsperLogger.configure_debug_logger
+.. _configure_discord_logger(): source/common.html#common.prosper_logging.ProsperLogger.configure_discord_logger
+.. _configure_slack_logger(): common.html#common.prosper_logging.ProsperLogger.configure_slack_logger
