@@ -106,6 +106,12 @@ setup(
         'pytest_cov',
         'mock'
     ],
+    extras_require={
+        'dev':[
+            'sphinx',
+            'sphinxcontrib-napoleon',
+        ]
+    },
     cmdclass={
         'test':PyTest
     }
