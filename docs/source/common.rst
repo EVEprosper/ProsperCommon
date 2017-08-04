@@ -1,0 +1,38 @@
+common package
+==============
+
+Submodules
+----------
+
+common\.prosper\_config module
+------------------------------
+
+.. automodule:: common.prosper_config
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+common\.prosper\_logging module
+-------------------------------
+
+.. automodule:: common.prosper_logging
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+common\.prosper\_utilities module
+---------------------------------
+
+.. automodule:: common.prosper_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: common
+    :members:
+    :undoc-members:
+    :show-inheritance:
