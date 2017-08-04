@@ -1,13 +1,31 @@
 """wheel setup for Prosper common utilities"""
-
+from codecs import open
+import importlib
 from os import path, listdir
+
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
-from codecs import open
 
 HERE = path.abspath(path.dirname(__file__))
-__version__ = '1.0.2'
-__project_name__ = 'common'
+__package_name__ = 'ProsperCommon'
+__library_name__ = 'common'
+
+def get_version(package_name):
+    """find __version__ for making package
+
+    Args:
+        package_path (str): path to _version.py folder (abspath > relpath)
+
+    Returns:
+        (str) __version__ value
+
+    """
+    module = 'prosper.' + package_name + '._version'
+    package = importlib.import_module(module)
+
+    version = package.__version__
+
+    return version
 
 def hack_find_packages(include_str):
     """patches setuptools.find_packages issue
@@ -59,7 +77,7 @@ class PyTest(TestCommand):
         self.pytest_args = [
             'tests',
             '-rx',
-            '--cov=prosper/' + __project_name__,
+            '--cov=prosper/' + __library_name__,
             '--cov-report=term-missing'
         ]    #load defaults here
 
@@ -79,13 +97,13 @@ with open('README.rst', 'r', 'utf-8') as f:
     readme = f.read()
 
 setup(
-    name='ProsperCommon',
+    name=__package_name__,
     description='Common Utilities for EVEProsper Projects',
-    version=__version__,
+    version=get_version(__library_name__),
     long_description=readme,
     author='John Purcell',
     author_email='prospermarketshow@gmail.com',
-    url='https://github.com/EVEprosper/ProsperCommon',
+    url='https://github.com/EVEprosper/' + __package_name__,
     license='MIT',
     classifiers=[
         'Programming Language :: Python :: 3.5'
