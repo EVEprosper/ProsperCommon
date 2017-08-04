@@ -10,9 +10,7 @@ ProsperCommon
 |Build Status| |Coverage Status| |PyPI Badge| |Docs|
 
 
-Common utilities for EVEProsper project. To
-reduce boilerplate across the shared projects in the 
-`EVEProsper <http://www.eveprosper.com>`_ toolset
+Common utilities for EVEProsper project. To reduce boilerplate across the shared projects in the `EVEProsper <http://www.eveprosper.com>`_ toolset
 
 Quickstart
 ==========
@@ -34,7 +32,7 @@ Index
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
    getting_started.rst
    source/common.rst
    prosper_logging.rst

@@ -127,7 +127,7 @@ ProsperLogger is designed with the following priority order for finding configur
 
 ## configuration_object
 
-.. code-block:: pygments.lexers.configs.IniLexer
+.. code-block:: none
 
     [LOGGING]
         log_level = INFO
