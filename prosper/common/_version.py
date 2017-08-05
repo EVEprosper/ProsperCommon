@@ -21,4 +21,6 @@ def get_version():
         )
         return '0.0.0'  #can't parse version without stuff installed
 
+    return p_version.get_version()
+
 __version__ = get_version()

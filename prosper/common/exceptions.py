@@ -20,3 +20,12 @@ class WebhookFailedEmitWarning(ProsperLoggerWarning):
 class ProsperVersionWarning(ProsperCommonWarning):
     """base class for prosper.common.prosper_version warnings"""
     pass
+class ProsperVersionTestModeWarning(ProsperVersionWarning):
+    """for overriding Travis modes for unit testing coverage"""
+    pass
+class ProsperDefaultVersionWarning(ProsperVersionWarning):
+    """unable to set any version other than default.  New project or broken git?"""
+    pass
+class ProsperNonProductionVersionWarning(ProsperVersionWarning):
+    """version is branch or other non-production build"""
+    pass

@@ -122,7 +122,8 @@ setup(
         'pytest',
         'testfixtures',
         'pytest_cov',
-        'mock'
+        'mock',
+        'yolk3k'
     ],
     extras_require={
         'dev':[
