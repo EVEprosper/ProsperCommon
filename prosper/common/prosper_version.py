@@ -89,7 +89,7 @@ def _read_git_tags(
     except Exception:
         raise
 
-    if not current_tags:
+    if not current_tags[0]:
         warnings.warn(
             'Unable to resolve current version',
             exceptions.ProsperDefaultVersionWarning)
