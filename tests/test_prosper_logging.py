@@ -139,6 +139,7 @@ def test_rotating_file_handle(config=TEST_CONFIG):
 
 #TODO: add pytest.mark to skip
 DISCORD_WEBHOOK = TEST_CONFIG.get_option('LOGGING', 'discord_webhook', None)
+@pytest.mark.loud
 def test_discord_webhook(config_override=TEST_CONFIG):
     """Push 'hello world' message through Discord webhook"""
 
@@ -153,6 +154,7 @@ def test_discord_webhook(config_override=TEST_CONFIG):
     test_handler.test(str(ME) + ' -- hello world')
 
 SLACK_WEBHOOK = TEST_CONFIG.get_option('LOGGING', 'slack_webhook', None)
+@pytest.mark.loud
 def test_slack_webhook(config_override=TEST_CONFIG):
     """push 'hello world' message through Slack webhook"""
     if not SLACK_WEBHOOK:
@@ -263,6 +265,7 @@ def test_iter_util(config=TEST_CONFIG):
 REQUEST_LOGNAME        = TEST_CONFIG.get_option('TEST', 'request_logname', None)
 REQUEST_NEW_CONNECTION = TEST_CONFIG.get_option('TEST', 'request_new_connection', None)
 REQUEST_POST_ENDPOINT  = TEST_CONFIG.get_option('TEST', 'request_POST_endpoint', None)
+@pytest.mark.loud
 def test_discord_logger(config=TEST_CONFIG):
     """Execute LogCapture on Discord logger object"""
     if not DISCORD_WEBHOOK: #FIXME: commenting doesn't work in config file?
@@ -301,6 +304,7 @@ def test_discord_logger(config=TEST_CONFIG):
 
 SLACK_NEW_CONNECTION = TEST_CONFIG.get_option('TEST', 'slack_new_connection', None)
 SLACK_POST_ENDPOINT = TEST_CONFIG.get_option('TEST', 'slack_POST_endpoint', None)
+@pytest.mark.loud
 def test_slack_logger(config=TEST_CONFIG):
     """Execute LogCapture on Slack logger object"""
     if not SLACK_WEBHOOK:

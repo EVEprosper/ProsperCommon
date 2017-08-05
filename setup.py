@@ -93,6 +93,21 @@ class PyTest(TestCommand):
         errno = pytest.main(pytest_commands)
         exit(errno)
 
+class QuietTest(PyTest):
+    """overrides to prevent webhook spam while developing"""
+    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = [
+            'tests',
+            '-rx',
+            '-m',
+            'not loud',
+            '--cov=prosper/' + __library_name__,
+            '--cov-report=term-missing'
+        ]
+
 with open('README.rst', 'r', 'utf-8') as f:
     readme = f.read()
 
@@ -136,6 +151,7 @@ setup(
         ]
     },
     cmdclass={
-        'test':PyTest
+        'test':PyTest,
+        'quiettest': QuietTest
     }
 )
