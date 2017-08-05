@@ -23,7 +23,7 @@ VERSION_FILEPATH = path.join(PROJECT_HERE_PATH, 'version.txt')
 
 def release_helper():
     """travis is kinda a jerk.  Let's make sure the expected environment is set up"""
-    travis_tag = os.environ.get('TRAVIS_TAG')
+    travis_tag = os.environ.get('TRAVIS_TAG').replace('v', '')
     if not travis_tag:
         return
 
