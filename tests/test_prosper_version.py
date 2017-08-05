@@ -21,6 +21,9 @@ ROOT = path.dirname(HERE)
 PROJECT_HERE_PATH = path.join(ROOT, 'prosper', 'common')
 VERSION_FILEPATH = path.join(PROJECT_HERE_PATH, 'version.txt')
 
+if os.environ.get('TRAVIS_TAG'):
+    p_version.get_version(PROJECT_HERE_PATH) #init for TRAVIS
+
 def test_version_virgin():
     """validate first-install overrides"""
     version.INSTALLED = False
@@ -57,6 +60,7 @@ def test_read_git_tags_default():
 
 def test_read_git_tags_happypath():
     """validate version matches expectation"""
+
     released_versions_report = check_output(['yolk', '-V', 'prospercommon']).splitlines()
 
     released_versions = []
@@ -67,8 +71,13 @@ def test_read_git_tags_happypath():
 
     tag_version = semantic_version.Version(p_version._read_git_tags())
 
-    assert tag_version <= current_version   #expect equal-to or less-than current release
+    tag_status = tag_version <= current_version   #expect equal-to or less-than current release
 
+    if os.environ.get('TRAVIS_TAG') and not tag_status:
+        pytest.xfail(
+            'Drafting release -- tag={} current={}'.format(tag_version, current_version))
+
+    assert tag_status
 def test_version_from_file_default():
     """validate default version returns from _version_from_file()"""
     with pytest.warns(exceptions.ProsperDefaultVersionWarning):
