@@ -77,7 +77,7 @@ def test_read_git_tags_happypath():
         pytest.xfail(
             'Drafting release -- tag={} current={}'.format(tag_version, current_version))
 
-    assert tag_status
+    assert tag_version <= current_version   #expect equal-to or less-than current release
 def test_version_from_file_default():
     """validate default version returns from _version_from_file()"""
     with pytest.warns(exceptions.ProsperDefaultVersionWarning):
