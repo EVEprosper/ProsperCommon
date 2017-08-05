@@ -46,15 +46,7 @@ def get_version(
     except Exception:   #pragma: no cover
         return _version_from_file(here_path)
 
-    feature_branch = decode(
-        check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]),
-        'utf-8').strip()
-
-    current_version = semantic_version.Version(current_tag)
-    if feature_branch != default_branch:    #pragma: no cover
-        ## Dev mode ##
-        current_version.build = (feature_branch,)
-
+    #TODO: tag build with branch name for dev debug
     #TODO: if #steps from tag root, increment minor
 
     current_version_str = str(current_version)
