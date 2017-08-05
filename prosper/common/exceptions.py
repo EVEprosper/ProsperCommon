@@ -26,6 +26,3 @@ class ProsperVersionTestModeWarning(ProsperVersionWarning):
 class ProsperDefaultVersionWarning(ProsperVersionWarning):
     """unable to set any version other than default.  New project or broken git?"""
     pass
-class ProsperNonProductionVersionWarning(ProsperVersionWarning):
-    """version is branch or other non-production build"""
-    pass

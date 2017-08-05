@@ -17,12 +17,14 @@ DEFAULT_BRANCH = 'master'
 TEST_MODE = False
 
 def get_version(
+        here_path,
         default_version=DEFAULT_VERSION,
         default_branch=DEFAULT_BRANCH
 ):
     """tries to resolve version number
 
     Args:
+        here_path (str): path to project local dir
         default_version (str, optional): what version to return if all else fails
         default_branch (str, optional): production branch name
 
@@ -39,7 +41,10 @@ def get_version(
                 'Travis detected, but TEST_MODE enabled',
                 exceptions.ProsperVersionTestModeWarning)
 
-    current_tag = _read_git_tags(default_version=default_version)
+    try:
+        current_tag = _read_git_tags(default_version=default_version)
+    except Exception:   #pragma: no cover
+        return _version_from_file(here_path)
 
     feature_branch = decode(
         check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]),
@@ -48,15 +53,16 @@ def get_version(
     current_version = semantic_version.Version(current_tag)
     if feature_branch != default_branch:    #pragma: no cover
         ## Dev mode ##
-        warnings.warn(
-            'Tagging non-production build',
-            exceptions.ProsperNonProductionVersionWarning
-        )
         current_version.build = (feature_branch,)
 
     #TODO: if #steps from tag root, increment minor
 
-    return str(current_version)
+    current_version_str = str(current_version)
+    with open(os.path.join(here_path, 'version.txt'), 'w') as v_fh:
+        #save version info somewhere static
+        v_fh.write(current_version_str)
+
+    return current_version_str
 
 def _read_git_tags(
         default_version=DEFAULT_VERSION,
@@ -78,7 +84,10 @@ def _read_git_tags(
         (:obj:`exceptions.ProsperDefaultVersionWarning`): git version not found
 
     """
-    current_tags = check_output(git_command).splitlines()
+    try:    #pragma: no cover
+        current_tags = check_output(git_command).splitlines()
+    except Exception:
+        raise
 
     if not current_tags:
         warnings.warn(
@@ -98,3 +107,30 @@ def _read_git_tags(
             latest_version = tag_ver
 
     return str(latest_version)
+
+def _version_from_file(
+        path_to_version,
+        default_version=DEFAULT_VERSION
+):
+    """for PyPI installed versions, just get data from file
+
+    Args:
+        path_to_version (str): abspath to dir where version.txt exists
+        default_version (str, optional): fallback version in case of error
+
+    Returns:
+        (str): current working version
+
+    """
+    version_filepath = os.path.join(path_to_version, 'version.txt')
+    if not os.path.isfile(version_filepath):
+        warnings.warn(
+            'Unable to resolve current version',
+            exceptions.ProsperDefaultVersionWarning)
+        return default_version
+
+    with open(version_filepath, 'r') as v_fh:
+        data = v_fh.read()
+
+    return data
+
