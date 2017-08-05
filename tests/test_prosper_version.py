@@ -21,8 +21,18 @@ ROOT = path.dirname(HERE)
 PROJECT_HERE_PATH = path.join(ROOT, 'prosper', 'common')
 VERSION_FILEPATH = path.join(PROJECT_HERE_PATH, 'version.txt')
 
-if os.environ.get('TRAVIS_TAG'):
-    p_version.get_version(PROJECT_HERE_PATH) #init for TRAVIS
+def release_helper():
+    """travis is kinda a jerk.  Let's make sure the expected environment is set up"""
+    travis_tag = os.environ.get('TRAVIS_TAG')
+    if not travis_tag:
+        return
+
+    print('--TRAVIS RELEASE HELPER--')
+    print('setting up {} with {}'.format(VERSION_FILEPATH, travis_tag))
+    with open(VERSION_FILEPATH, 'w') as v_fh:
+        v_fh.write(travis_tag)
+
+release_helper()
 
 def test_version_virgin():
     """validate first-install overrides"""
