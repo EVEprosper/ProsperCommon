@@ -16,6 +16,9 @@ class ProsperLoggerWarning(ProsperCommonWarning):
 class WebhookFailedEmitWarning(ProsperLoggerWarning):
     """Something went wrong in webhook handler.  Warn rather than raise"""
     pass
+class WebhookCreateFailed(ProsperLoggerWarning):
+    """unable to generate webhook requested"""
+    pass
 
 class ProsperVersionWarning(ProsperCommonWarning):
     """base class for prosper.common.prosper_version warnings"""

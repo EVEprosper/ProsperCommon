@@ -33,6 +33,7 @@ import requests
 #import prosper.common as common
 import prosper.common.prosper_config as p_config
 import prosper.common.prosper_utilities as p_utils
+import prosper.common.exceptions as exceptions
 
 HERE = path.abspath(path.dirname(__file__))
 ME = __file__.replace('.py', '')
@@ -265,17 +266,11 @@ class ProsperLogger(object):
             None, discord_recipient
         )
 
-        ## Make sure we CAN build a discord webhook ##
-        if not discord_webhook:
-            warnings.warn(
-                'Lacking discord_webhook defintion, unable to attach webhook',
-                RuntimeWarning
-            )
-            return
-
         ## Actually build discord logging handler ##
         discord_obj = DiscordWebhook()
         discord_obj.webhook(discord_webhook)
+
+        ## vv TODO vv: Test review ##
         if discord_obj.can_query:
             try:
                 discord_handler = HackyDiscordHandler(
@@ -294,8 +289,9 @@ class ProsperLogger(object):
         else:
             warnings.warn(
                 'Unable to execute webhook',
-                RuntimeWarning
+                exceptions.WebhookCreateFailed
             )
+        ## ^^ TODO ^^ ##
 
     def configure_slack_logger(
             self,
@@ -322,17 +318,8 @@ class ProsperLogger(object):
             'LOGGING', 'slack_webhook',
             None, slack_webhook
         )
-
-
-        ## Make sure we CAN build a slack webhook ##
-        if not slack_webhook:
-            warnings.warn(
-                'Lacking slack_webhook defintion, unable to attach webhook',
-                RuntimeWarning
-            )
-            return
-
         ## Actually build slack logging handler ##
+        ## vv TODO vv: Test review ##
         try:
             slack_handler = HackySlackHandler(
                 slack_webhook
@@ -346,6 +333,7 @@ class ProsperLogger(object):
             )
         except Exception as error_msg:
             raise error_msg
+        ## ^^ TODO ^^ ##
 
 def test_logpath(log_path, debug_mode=False):
     """Tests if logger has access to given path and sets up directories
@@ -552,7 +540,7 @@ class HackyDiscordHandler(logging.Handler):
     Discord webhook API docs: https://discordapp.com/developers/docs/resources/webhook
 
     """
-    def __init__(self, webhook_obj, alert_recipient=None):
+    def __init__(self, webhook_obj, alert_recipient=None):  #pragma: no cover
         """HackyDiscordHandler init
 
         Args:
@@ -607,15 +595,16 @@ class HackyDiscordHandler(logging.Handler):
                 headers=header,
                 json=payload
             )
-        except Exception as error_msg:
+            request.raise_for_status()
+        except Exception as error_msg:  #pragma: no cover
             warning_msg = (
                 'EXCEPTION: UNABLE TO COMMIT LOG MESSAGE' +
-                '\n\texception={0}'.format(error_msg) +
+                '\n\texception={0}'.format(repr(error_msg)) +
                 '\n\tmessage={0}'.format(message)
             )
             warnings.warn(
                 warning_msg,
-                RuntimeWarning
+                exceptions.WebhookFailedEmitWarning
             )
     def test(self, message):
         """testing hook for exercising webhook directly"""
@@ -627,7 +616,7 @@ class HackyDiscordHandler(logging.Handler):
 
 class HackySlackHandler(logging.Handler):
     """Custom logging.Handler for pushing messages to Discord"""
-    def __init__(self, webhook_url):
+    def __init__(self, webhook_url):    #pragma: no cover
         logging.Handler.__init__(self)
 
         self.webhook_url = webhook_url
@@ -695,13 +684,14 @@ class HackySlackHandler(logging.Handler):
                 headers=header,
                 json=payload
             )
-        except Exception as error_msg:
+            request.raise_for_status()
+        except Exception as error_msg:  #pragma: no cover
             warning_msg = (
                 'EXCEPTION: UNABLE TO COMMIT LOG MESSAGE' +
-                '\n\texception={0}'.format(error_msg) +
-                '\n\tmessage={0}'.format(message)
+                '\n\texception={0}'.format(repr(error_msg)) +
+                '\n\tmessage={0}'.format(log_msg)
             )
             warnings.warn(
                 warning_msg,
-                RuntimeWarning
+                exceptions.WebhookFailedEmitWarning
             )
