@@ -46,15 +46,14 @@ def get_version(
     except Exception:   #pragma: no cover
         return _version_from_file(here_path)
 
-    #TODO: tag build with branch name for dev debug
     #TODO: if #steps from tag root, increment minor
+    #TODO: check if off main branch and add name to prerelease
 
-    current_version_str = str(current_version)
     with open(os.path.join(here_path, 'version.txt'), 'w') as v_fh:
         #save version info somewhere static
-        v_fh.write(current_version_str)
+        v_fh.write(current_tag)
 
-    return current_version_str
+    return current_tag
 
 def _read_git_tags(
         default_version=DEFAULT_VERSION,
