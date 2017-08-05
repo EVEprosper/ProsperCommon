@@ -38,7 +38,9 @@ Docs
 ----
 
     ``pip install .[dev]``
+
     ``sphinx-apidoc -f -o docs/source prosper/common/`` Update autodocs
+    
     ``sphinx-build -b html docs/ webpage/`` build docs
 
 Documentation is important.  Please make sure to update docs before release
