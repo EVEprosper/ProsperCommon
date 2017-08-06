@@ -78,7 +78,8 @@ class PyTest(TestCommand):
             'tests',
             '-rx',
             '--cov=prosper/' + __library_name__,
-            '--cov-report=term-missing'
+            '--cov-report=term-missing',
+            '--cov-config=.coveragerc'
         ]    #load defaults here
 
     def run_tests(self):
@@ -105,7 +106,8 @@ class QuietTest(PyTest):
             '-m',
             'not loud',
             '--cov=prosper/' + __library_name__,
-            '--cov-report=term-missing'
+            '--cov-report=term-missing',
+            '--cov-config=.coveragerc'
         ]
 
 with open('README.rst', 'r', 'utf-8') as f:
