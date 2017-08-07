@@ -9,7 +9,7 @@ ProsperConfig()
 ===============
 
 .. code-block:: python
-   :linenos:
+
     import prosper.common.prosper_config as p_config
 
     ConfigObj = ProsperConfig(
