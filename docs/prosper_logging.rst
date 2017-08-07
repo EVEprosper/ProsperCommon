@@ -10,7 +10,6 @@ ProsperLogger()
 Building a logger is easy.
 
 .. code-block:: python
-   :linenos:
 
     import prosper.common.prosper_logging as p_loging
 
@@ -33,7 +32,7 @@ Built-In Handlers
 =================
 
 `configure_default_logger()`_
---------------------------
+-----------------------------
 
 .. code-block:: python
    :linenos:
@@ -55,7 +54,7 @@ Built-In Handlers
 This handler is loaded by default.  It can be reset by calling ``ProsperLogger().configure_default_logger(...)`` again.  **THIS SHOULD BE DONE AS EARLY AS POSSIBLE** can wipe out all other attached handlers.
 
 `configure_debug_logger()`_
-------------------------
+---------------------------
 
 .. code-block:: python
    :linenos:
@@ -73,7 +72,7 @@ This handler is loaded by default.  It can be reset by calling ``ProsperLogger()
 For live debugging, report logging messages to standard out.  This can be attached by a `Plumbum.cli <http://plumbum.readthedocs.io/en/latest/cli.html>`_ for easy toggling between debug/production logging
 
 `configure_discord_logger()`_
---------------------------
+-----------------------------
 
 .. code-block:: python
    :linenos:
@@ -95,7 +94,7 @@ For live debugging, report logging messages to standard out.  This can be attach
 Live alerting is a useful tool.  ProsperCommon is loaded with a REST handler for pushing logging alerts to `discord webhooks <https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks>`_.  Any alerts above a given level will be pushed out to a discord channel along the webhook pipeline
 
 `configure_slack_logger()`_
-------------------------
+---------------------------
 
 .. code-block:: python
    :linenos:
