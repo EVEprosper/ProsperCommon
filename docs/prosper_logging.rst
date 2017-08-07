@@ -1,6 +1,6 @@
-==============================
-prosper.common.prosper_logging
-==============================
+=============
+ProsperLogger
+=============
 
 All `Prosper <https://github.com/EVEprosper>`_ scripts use a unified logger.  ``ProsperLogger`` is the easy way to build/extend any logger.  Death to ``print()`` long live ``logger``
 

@@ -17,6 +17,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+from collections import OrderedDict
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../prosper'))
@@ -107,6 +108,10 @@ html_theme_options = {
     'github_user': 'eveprosper',
     'github_repo': 'prospercommon',
     'github_banner': True,
+    #'extra_nav_links':OrderedDict([
+    #    ('API Reference', 'source/common.html')
+    #])
+
     #'donate_url': 'https://www.patreon.com/eveprosper',
 }
 
@@ -122,7 +127,7 @@ html_static_path = ['static']
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
     'index': [
-        'about.html', 'patreon.html', 'searchbox.html',
+        'about.html', 'patreon.html', 'navigation.html', 'searchbox.html',
     ],
     '**': [
         'globaltoc.html', 'sourcelink.html', 'searchbox.html'

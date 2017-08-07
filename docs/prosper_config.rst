@@ -1,6 +1,6 @@
-==============================
-prosper.common.prosper_config
-==============================
+=============
+ProsperConfig
+=============
 Parsing global/local configs can be obnoxious.  We provide a way to use/override configs.  Especially for libraries, a way to control globals or override them.
 
 All `Prosper <https://github.com/EVEprosper>`_ use the ``ProsperConfig`` parser.  Powered by py3's ``configparser``.

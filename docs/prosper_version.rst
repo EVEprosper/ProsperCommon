@@ -1,6 +1,6 @@
-==============================
-prosper.common.prosper_version
-==============================
+==============
+ProsperVersion
+==============
 
 Getting version information reliably vs `GitHub`_, `PyPI`_, `Travis-CI`_, and `source`_ is difficult.  Taking a page out of `ccpgames/setuphelpers`_ to standardize work.
 
@@ -8,6 +8,7 @@ Using prosper_version
 =====================
 
 .. code-block:: python
+    
     _version.py 
     """_version.py: a place to report package version info"""
     from os import path

@@ -30,14 +30,21 @@ Index
 =====
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
+ 
+    getting_started.rst
+    prosper_logging.rst
+    prosper_config.rst
+    prosper_version.rst
 
-   getting_started.rst
-   source/common.rst
-   prosper_logging.rst
-   prosper_config.rst
-   prosper_version.rst
+API Reference
+=============
+
+.. toctree::
+    :maxdepth: 2
+ 
+    source/common.rst
 
 Indices and tables
 ==================
