@@ -56,6 +56,7 @@ def test_version_expected():
     #TODO: meaningless test?
     with open(VERSION_FILEPATH, 'r') as v_fh:
         version_from_file = v_fh.read()
+    version_from_file = version_from_file.replace('v', '')
 
     assert version_from_file == version.__version__
 
