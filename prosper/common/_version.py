@@ -18,11 +18,15 @@ def get_version():
 
     """
     if not INSTALLED:
-        warnings.warn(
-            'Unable to resolve package version until installed',
-            UserWarning
-        )
-        return '0.0.0'  #can't parse version without stuff installed
+        try:
+            with open('version.txt', 'r') as v_fh:
+                return v_fh.read()
+        except Exception:
+            warnings.warn(
+                'Unable to resolve package version until installed',
+                UserWarning
+            )
+            return '0.0.0'  #can't parse version without stuff installed
 
     return p_version.get_version(HERE)
 
