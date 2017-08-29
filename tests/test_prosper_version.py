@@ -104,7 +104,9 @@ def test_version_from_file_default():
 def test_version_from_file_happypath():
     """validate version matches expectation"""
     #TODO: meaningless test?
-    assert p_version._version_from_file(PROJECT_HERE_PATH) == version.__version__
+    version_from_file = p_version._version_from_file(PROJECT_HERE_PATH)
+    version_from_file = version_from_file.replace('v', '')
+    assert version_from_file == version.__version__
 
 def test_travis_tag_testmode():
     """validate testmode can reach expected path"""
