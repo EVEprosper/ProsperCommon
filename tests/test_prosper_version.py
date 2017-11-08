@@ -6,6 +6,7 @@ Pytest functions for exercising prosper.common.prosper_version
 from codecs import decode
 from os import path
 import os
+import shutil
 from subprocess import check_output
 
 import pytest
@@ -124,3 +125,21 @@ def test_travis_tag_testmode():
     p_version.TEST_MODE = False
     if old_environ:
         os.environ['TRAVIS_TAG'] = old_environ
+
+def test_version_installed_as_dep():
+    """validate expected return when installed as dependency"""
+    # Prep a dummy version
+    virtualenv_name = 'DUMMY_VENV'
+    dummy_version = '9.9.9'
+    virtualenv_path = path.join(
+        HERE, virtualenv_name, 'lib/python3.6/site-packages/prosper/common')
+    os.makedirs(virtualenv_path, exist_ok=True)
+    with open(path.join(virtualenv_path, 'version.txt'), 'w') as dummy_fh:
+        dummy_fh.write(dummy_version)
+
+
+    # Test the thing
+    assert p_version.get_version(virtualenv_path) == dummy_version
+
+    # Clean up yer mess
+    shutil.rmtree(path.join(HERE, virtualenv_name))

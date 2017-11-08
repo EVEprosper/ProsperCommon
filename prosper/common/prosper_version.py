@@ -18,23 +18,25 @@ TEST_MODE = False
 
 def get_version(
         here_path,
-        default_version=DEFAULT_VERSION,
-        default_branch=DEFAULT_BRANCH
+        default_version=DEFAULT_VERSION
 ):
     """tries to resolve version number
 
     Args:
         here_path (str): path to project local dir
         default_version (str, optional): what version to return if all else fails
-        default_branch (str, optional): production branch name
 
     Returns:
-        (str): semantic_version information for library
+        str: semantic_version information for library
 
     """
+    if 'site-packages' in here_path:
+        # Running as dependency
+        return _version_from_file(here_path)
+
     if os.environ.get('TRAVIS_TAG'):
-        #Running on Travis-CI: trumps all
-        if not TEST_MODE:   #pragma: no cover
+        # Running on Travis-CI: trumps all
+        if not TEST_MODE:  # pragma: no cover
             return os.environ.get('TRAVIS_TAG').replace('v', '')
         else:
             warnings.warn(
@@ -43,14 +45,14 @@ def get_version(
 
     try:
         current_tag = _read_git_tags(default_version=default_version)
-    except Exception:   #pragma: no cover
+    except Exception:  # pragma: no cover
         return _version_from_file(here_path)
 
-    #TODO: if #steps from tag root, increment minor
-    #TODO: check if off main branch and add name to prerelease
+    # TODO: if #steps from tag root, increment minor
+    # TODO: check if off main branch and add name to prerelease
 
     with open(os.path.join(here_path, 'version.txt'), 'w') as v_fh:
-        #save version info somewhere static
+        # save version info somewhere static
         v_fh.write(current_tag)
 
     return current_tag
@@ -69,13 +71,13 @@ def _read_git_tags(
         git_command (:obj:`list`, optional): subprocess command
 
     Retruns:
-        (str): latest version found, or default
+        str: latest version found, or default
 
     Raises:
-        (:obj:`exceptions.ProsperDefaultVersionWarning`): git version not found
+        exceptions.ProsperDefaultVersionWarning: git version not found
 
     """
-    try:    #pragma: no cover
+    try:  # pragma: no cover
         current_tags = check_output(git_command).splitlines()
     except Exception:
         raise
@@ -91,8 +93,8 @@ def _read_git_tags(
         tag_str = decode(tag, 'utf-8').replace('v', '')
         try:
             tag_ver = semantic_version.Version(tag_str)
-        except Exception:   #pragma: no cover
-            continue    #invalid tags ok, but no release
+        except Exception:  # pragma: no cover
+            continue  # invalid tags ok, but no release
 
         if tag_ver > latest_version:
             latest_version = tag_ver
@@ -110,7 +112,7 @@ def _version_from_file(
         default_version (str, optional): fallback version in case of error
 
     Returns:
-        (str): current working version
+        str: current working version
 
     """
     version_filepath = os.path.join(path_to_version, 'version.txt')
@@ -124,4 +126,3 @@ def _version_from_file(
         data = v_fh.read()
 
     return data
-
