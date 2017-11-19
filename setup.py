@@ -133,7 +133,8 @@ setup(
     },
     install_requires=[
         'requests',
-        'semantic_version'
+        'semantic_version',
+        'plumbum'
     ],
     tests_require=[
         'pytest',

@@ -1,9 +1,11 @@
 """Plumbum CLI wrapper for easier/common application writing"""
+import abc
 import platform
 
 from plumbum import cli
 
 import prosper.common.prosper_logging as p_logging
+
 
 class ProsperApplication(cli.Application):
     """parent-wrapper for CLI applications"""
@@ -18,7 +20,14 @@ class ProsperApplication(cli.Application):
         help='enable verbose messaging'
     )
 
-    config_path = None  # TODO: force child to implement var?
+    def __new__(cls, *args, **kwargs):
+        """wrapper for ensuring expected functions"""
+        if not hasattr(cls, 'config_path'):
+            raise NotImplementedError(
+                '`config_path` required path to default .cfg file'
+            )
+        return super(cli.Application, cls).__new__(cls)  # don't break cli.Application
+
     @cli.switch(
         ['--config'],
         str,
@@ -39,14 +48,29 @@ class ProsperApplication(cli.Application):
         exit()
 
     @property
-    def logger():
+    def logger(self):
         """builds a logger on-demand when first called"""
         pass
 
     @property
-    def config():
+    def config(self):
         """builds a ProsperConfig object on-demand when first called"""
         pass
 
+
+class ProsperTESTApplication(ProsperApplication):
+    """test wrapper for CLI tests"""
+    from os import path
+    PROGNAME = 'CLITEST'
+    VERSION = '0.0.0'
+
+    HERE = path.abspath(path.dirname(__file__))
+
+    config_path = path.join(HERE, 'common_config.cfg')
+
+    def main(self):
+        """do stuff"""
+        print('hello world')
+
 if __name__ == '__main__':
-    ProsperApplication.run()  # test hook
+    ProsperTESTApplication.run()  # test hook
