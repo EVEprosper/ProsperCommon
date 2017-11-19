@@ -379,21 +379,16 @@ def test_log_format_name():
     format_actual = prosper_logging.ReportingFormats[test_format].value
     test_file = path.join(HERE, 'test_alt_format.cfg')
 
-    test_logname = 'test_logger'
+    test_logname = 'fmt_test_logger'
     logger_builder = prosper_logging.ProsperLogger(
         test_logname,
         LOG_PATH,
         config_obj=prosper_config.ProsperConfig(test_file)
     )
-
-    logger_builder.configure_default_logger()
     logger = logger_builder.get_logger()
 
-    result = False
     for fmt in [h.formatter._fmt for h in logger.handlers]: #check if we have a handler with the requested format
-        result = result or fmt == format_actual
-
-    assert result
+        assert fmt == format_actual.format(custom_args='')
 
 def test_debugmode_pathing():
     """validate debug_mode=True behaivor in test_logpath"""
@@ -529,25 +524,3 @@ def test_send_msg_to_webhook_faulty(warn, post):
     handler.send_msg_to_webhook('dummy')
 
     assert warn.called
-
-@patch('prosper.common.prosper_logging.warnings.warn')
-def test_prosper_logger_close_handles(warn, config=TEST_CONFIG):
-    "test if warning is given when closing a handler exceptionlally"
-
-    fake_handler = logging.StreamHandler()
-    fake_handler.close = Mock(side_effect=Exception)
-
-    test_logname = 'test_logger'
-    logger_builder = prosper_logging.ProsperLogger(
-        test_logname,
-        LOG_PATH,
-        config_obj=config
-    )
-
-    logger_builder.log_handlers.append(fake_handler)
-    logger_builder.close_handles()
-
-    assert warn.called
-
-if __name__ == '__main__':
-    test_rotating_file_handle()

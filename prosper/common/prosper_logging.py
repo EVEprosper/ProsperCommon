@@ -50,12 +50,14 @@ DEFAULT_LOGGER.addHandler(logging.NullHandler())
 
 SILENCE_OVERRIDE = False    #deactivate webhook loggers for testmode
 
+
 class ReportingFormats(Enum):
     """Enum for storing handy log formats"""
-    DEFAULT = '[%(asctime)s;%(levelname)s;%(filename)s;%(funcName)s;%(lineno)s] %(message)s'
-    PRETTY_PRINT = '[%(levelname)s:%(filename)s--%(funcName)s:%(lineno)s]\n%(message).1000s'
-    STDOUT = '[%(levelname)s:%(filename)s--%(funcName)s:%(lineno)s] %(message)s'
+    DEFAULT = '[%(asctime)s;%(levelname)s;%(filename)s;%(funcName)s;%(lineno)s{custom_args}] %(message)s'
+    PRETTY_PRINT = '[%(levelname)s:%(filename)s--%(funcName)s:%(lineno)s{custom_args}]\n%(message).1000s'
+    STDOUT = '[%(levelname)s:%(filename)s--%(funcName)s:%(lineno)s{custom_args}] %(message)s'
     SLACK_PRINT = '%(message).1000s'
+
 
 class ProsperLogger(object):
     """One logger to rule them all.  Build the right logger for your script in a few easy steps
@@ -77,7 +79,7 @@ class ProsperLogger(object):
             log_name,
             log_path,
             config_obj=COMMON_CONFIG,
-            debug_mode=_debug_mode
+            custom_args='',
     ):
         """ProsperLogger initialization
 
@@ -85,7 +87,7 @@ class ProsperLogger(object):
             log_name (str): the name of the log/log_object
             log_path (str): path for logfile.  abspath > relpath
             config_obj (:obj:`configparser.ConfigParser`, optional): config object for loading default behavior
-            debug_mode (bool): debug/verbose modes inside object (UNIMPLEMENTED)
+            custom_args (str): special ID to include in (ALL) messages
 
         """
         self.logger = logging.getLogger(log_name)
@@ -93,10 +95,8 @@ class ProsperLogger(object):
             raise TypeError
         self.config = config_obj
 
-        #self.log_options = p_utils.parse_options(config_obj, 'LOGGING')
-        self._debug_mode = debug_mode
         self.log_name = log_name
-        self.log_path = test_logpath(log_path, debug_mode)
+        self.log_path = test_logpath(log_path)
 
         self.log_info = []
         self.log_handlers = []
@@ -105,7 +105,7 @@ class ProsperLogger(object):
             log_freq='midnight',
             log_total=30,
             log_level='INFO',
-            debug_mode=debug_mode
+            custom_args=custom_args
         )
 
     def get_logger(self):
@@ -123,15 +123,8 @@ class ProsperLogger(object):
 
     def close_handles(self):
         """cannot delete logs unless handles are closed (windows)"""
-        for handle in self.log_handlers:
-            try:
-                handle.close()
-            except Exception:
-                warnings.warn(
-                    'WARNING: unable to close logging handle',
-                    RuntimeWarning
-                )
-                pass #do not crash if can't close handle
+        for handle in self.logger.handlers:
+            handle.close()
 
     def _configure_common(
             self,
@@ -139,7 +132,8 @@ class ProsperLogger(object):
             fallback_level,
             fallback_format,
             handler_name,
-            handler
+            handler,
+            custom_args=''
     ):
         """commom configuration code
 
@@ -149,6 +143,7 @@ class ProsperLogger(object):
             fallback_format (str): Fallback format for if it's not in the config.
             handler_name (str): Handler used in debug messages.
             handler (str): The handler to configure and use.
+            custom_args (str): special ID to include in messages
 
         """
         ## Retrieve settings from config ##
@@ -161,6 +156,7 @@ class ProsperLogger(object):
             None, None
         )
         log_format = ReportingFormats[log_format_name].value if log_format_name else fallback_format
+        log_format = log_format.format(custom_args=custom_args)  # should work even if no {custom_args}
 
         ## Attach handlers/formatter ##
         formatter = logging.Formatter(log_format)
@@ -180,7 +176,7 @@ class ProsperLogger(object):
             log_total=30,
             log_level='INFO',
             log_format=ReportingFormats.DEFAULT.value,
-            debug_mode=_debug_mode
+            custom_args=''
     ):
         """default logger that every Prosper script should use!!
 
@@ -189,7 +185,7 @@ class ProsperLogger(object):
             log_total (int): how many log_freq periods between log rotations
             log_level (str): minimum desired log level https://docs.python.org/3/library/logging.html#logging-levels
             log_format (str): format for logging messages https://docs.python.org/3/library/logging.html#logrecord-attributes
-            debug_mode (bool): a way to trigger debug/verbose modes inside object (UNIMPLEMENTED)
+            custom_args (str): special ID to include in (ALL) messages
 
         """
         ## Override defaults if required ##
@@ -212,13 +208,20 @@ class ProsperLogger(object):
             backupCount=int(log_total)
         )
 
-        self._configure_common('', log_level, log_format, 'default', general_handler)
+        self._configure_common(
+            '',
+            log_level,
+            log_format,
+            'default',
+            general_handler,
+            custom_args=custom_args
+        )
 
     def configure_debug_logger(
             self,
             log_level='DEBUG',
             log_format=ReportingFormats.STDOUT.value,
-            debug_mode=_debug_mode
+            custom_args=''
     ):
         """debug logger for stdout messages.  Replacement for print()
 
@@ -228,11 +231,17 @@ class ProsperLogger(object):
         Args:
             log_level (str): desired log level for handle https://docs.python.org/3/library/logging.html#logging-levels
             log_format (str): format for logging messages https://docs.python.org/3/library/logging.html#logrecord-attributes
-            debug_mode (bool): a way to trigger debug/verbose modes inside object (UNIMPLEMENTED)
+            custom_args (str): special ID to include in messages
 
         """
-
-        self._configure_common('debug_', log_level, log_format, 'Debug', logging.StreamHandler())
+        self._configure_common(
+            'debug_',
+            log_level,
+            log_format,
+            'Debug',
+            logging.StreamHandler(),
+            custom_args=custom_args
+        )
 
     def configure_discord_logger(
             self,
@@ -240,7 +249,7 @@ class ProsperLogger(object):
             discord_recipient=None,
             log_level='ERROR',
             log_format=ReportingFormats.PRETTY_PRINT.value,
-            debug_mode=_debug_mode
+            custom_args=''
     ):
         """logger for sending messages to Discord.  Easy way to alert humans of issues
 
@@ -248,12 +257,13 @@ class ProsperLogger(object):
             Will try to overwrite minimum log level to enable requested log_level
             Will warn and not attach hipchat logger if missing webhook key
             Learn more about webhooks: https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+
         Args:
             discord_webhook (str): discord room webhook (full URL)
             discord_recipient (`str`:<@int>, optional): user/group to notify
             log_level (str): desired log level for handle https://docs.python.org/3/library/logging.html#logging-levels
             log_format (str): format for logging messages https://docs.python.org/3/library/logging.html#logrecord-attributes
-            debug_mode (bool): a way to trigger debug/verbose modes inside object (UNIMPLEMENTED)
+            custom_args (str): special ID to include in messages
 
         """
         ## Override defaults if required ##
@@ -282,7 +292,8 @@ class ProsperLogger(object):
                     log_level,
                     log_format,
                     'Discord',
-                    discord_handler
+                    discord_handler,
+                    custom_args=custom_args
                 )
             except Exception as error_msg: #FIXME: remove this, if we're just re-throwing?
                 raise error_msg
@@ -298,7 +309,7 @@ class ProsperLogger(object):
             slack_webhook=None,
             log_level='ERROR',
             log_format=ReportingFormats.SLACK_PRINT.value,
-            debug_mode=_debug_mode
+            custom_args=''
     ):
         """logger for sending messages to Discord.  Easy way to alert humans of issues
 
@@ -310,7 +321,7 @@ class ProsperLogger(object):
             slack_webhook (str): slack bot webhook (full URL)
             log_level (str): desired log level for handle https://docs.python.org/3/library/logging.html#logging-levels
             log_format (str): format for logging messages https://docs.python.org/3/library/logging.html#logrecord-attributes
-            debug_mode (bool): a way to trigger debug/verbose modes inside object (UNIMPLEMENTED)
+            custom_args (str): special ID to include in messages
 
         """
         ## Override defaults if required ##
@@ -329,7 +340,8 @@ class ProsperLogger(object):
                 log_level,
                 log_format,
                 'Slack',
-                slack_handler
+                slack_handler,
+                custom_args=custom_args
             )
         except Exception as error_msg:
             raise error_msg
@@ -389,83 +401,6 @@ def test_logpath(log_path, debug_mode=False):
 
     return log_path
 
-def create_logger(
-        log_name,
-        log_path,
-        config_obj = None,
-        log_level_override = ''
-):   #pragma: no cover
-    """DEPRECATED: classic v1 logger.  Obsolete by v0.3.0"""
-    warnings.warn(
-        'create_logger replaced with ProsperLogger object',
-        DeprecationWarning
-    )
-    if not config_obj:
-        config_obj = COMMON_CONFIG
-
-    if not path.exists(log_path):
-        makedirs(log_path)
-
-    Logger = logging.getLogger(log_name)
-
-    log_level = config_obj.get('LOGGING', 'log_level')
-    log_freq  = config_obj.get('LOGGING', 'log_freq')
-    log_total = config_obj.get('LOGGING', 'log_total')
-
-    log_name = log_name + '.log'
-    log_format = '[%(asctime)s;%(levelname)s;%(filename)s;%(funcName)s;%(lineno)s] %(message)s'
-    if log_level_override:
-        log_level = log_level_override
-
-    log_full_path = path.join(log_path, log_name)
-
-    Logger.setLevel(log_level)
-    generalHandler = TimedRotatingFileHandler(
-        log_full_path,
-        when=log_freq,
-        interval=1,
-        backupCount=int(log_total)
-    )
-    formatter = logging.Formatter(log_format)
-    generalHandler.setFormatter(formatter)
-    Logger.addHandler(generalHandler)
-
-    if log_level_override == 'DEBUG':
-        short_format = '[%(levelname)s:%(filename)s--%(funcName)s:%(lineno)s] %(message)s'
-        short_formatter = logging.Formatter(short_format)
-        stdout = logging.StreamHandler()
-        stdout.setFormatter(short_formatter)
-        Logger.addHandler(stdout)
-
-    if all([
-            config_obj.has_option('LOGGING', 'discord_webhook'),
-            config_obj.has_option('LOGGING', 'discord_level'),
-            #config_obj.has_option('LOGGING', 'discord_alert_recipient')
-    ]):
-        #message_maxlength = DISCORD_MESSAGE_LIMIT - DISCORD_PAD_SIZE
-        discord_format = '[%(levelname)s:%(filename)s--%(funcName)s:%(lineno)s]\n%(message).1400s'
-        alert_recipient = None
-        if config_obj.has_option('LOGGING', 'discord_alert_recipient'):
-            alert_recipient = config_obj.get('LOGGING', 'discord_alert_recipient')
-
-        discord_obj = DiscordWebhook()
-        discord_obj.webhook(config_obj.get('LOGGING', 'discord_webhook'))
-        discord_level = config_obj.get('LOGGING', 'discord_level')
-        do_discord = all([discord_obj.can_query, discord_level])
-        if do_discord:
-            try:
-                dh = HackyDiscordHandler(
-                    discord_obj,
-                    alert_recipient
-                )
-                dh_format = logging.Formatter(discord_format)
-                dh.setFormatter(dh_format)
-                dh.setLevel(discord_level)
-                Logger.addHandler(dh)
-            except Exception as error_msg:
-                raise error_msg
-
-    return Logger
 
 class DiscordWebhook(object):
     """Helper object for parsing info and testing discord webhook credentials
@@ -529,6 +464,7 @@ class DiscordWebhook(object):
 
     def __str__(self):
         return self.webhook_url
+
 
 class HackyDiscordHandler(logging.Handler):
     """Custom logging.Handler for pushing messages to Discord
@@ -613,6 +549,7 @@ class HackyDiscordHandler(logging.Handler):
             self.send_msg_to_webhook(message)
         except Exception as error_msg:
             raise error_msg
+
 
 class HackySlackHandler(logging.Handler):
     """Custom logging.Handler for pushing messages to Discord"""

@@ -20,7 +20,6 @@ LOCAL_CONFIG_PATH = path.join(
     'common_config.cfg'
 )
 
-butt = None
 
 class TestMetaClasses:
     """validate expected errors from abc"""
