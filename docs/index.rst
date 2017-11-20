@@ -25,6 +25,7 @@ Features
 * `prosper_logging`_: logging helpers/builders for Prosper projects
 * `prosper_config`_: unified configparser to pick the right values and keep secrets off github
 * `prosper_version`_: helpers to resolve correct package version 
+* `prosper_cli`_: framework for creating CLI applications
 
 Index
 =====
@@ -37,6 +38,7 @@ Index
     prosper_logging.rst
     prosper_config.rst
     prosper_version.rst
+    prosper_cli.rst
 
 API Reference
 =============
@@ -56,6 +58,7 @@ Indices and tables
 .. _prosper_logging: prosper_logging.html
 .. _prosper_config: prosper_config.html
 .. _prosper_version: prosper_version.html
+.. _prosper_cli: prosper_cli.html
 
 .. |Build Status| image:: https://travis-ci.org/EVEprosper/ProsperCommon.svg?branch=master
     :target: https://travis-ci.org/EVEprosper/ProsperCommon

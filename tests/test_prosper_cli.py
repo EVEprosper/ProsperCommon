@@ -3,6 +3,7 @@
 Pytest functions for exercising prosper.common.cli
 
 """
+import configparser
 from os import path
 
 import pytest
@@ -47,7 +48,7 @@ class TestCLI:
     def test_happypath(self):
         """validate output is output"""
         # TODO: test isn't working, but OK?
-        result = self.cli('-d')
+        result = self.cli('-v')
         if not result:
             pytest.xfail('expected output?  `{}`'.format(result))
 
@@ -60,3 +61,10 @@ class TestCLI:
         """validate help messages show up"""
         result = self.cli('-h')
         assert result.rstrip()
+
+    def test_dump_config(self):
+        """validate --dump-config works as expected"""
+        result = self.cli('--dump-config')
+
+        config = configparser.ConfigParser()
+        config.read_string(result)

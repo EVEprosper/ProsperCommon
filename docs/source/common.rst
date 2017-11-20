@@ -12,6 +12,14 @@ common\.exceptions module
     :undoc-members:
     :show-inheritance:
 
+common\.prosper\_cli module
+---------------------------
+
+.. automodule:: common.prosper_cli
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 common\.prosper\_config module
 ------------------------------
 

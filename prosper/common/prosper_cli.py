@@ -60,7 +60,7 @@ class ProsperApplication(cli.Application):
                 config_obj=self.config
             )
 
-            if self.debug:
+            if self.verbose:
                 log_builder.configure_debug_logger()
             else:
                 id_string = '({platform}--{version})'.format(
