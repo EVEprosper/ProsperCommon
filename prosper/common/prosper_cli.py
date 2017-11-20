@@ -1,10 +1,10 @@
 """Plumbum CLI wrapper for easier/common application writing"""
-import abc
 import platform
 
 from plumbum import cli
 
 import prosper.common.prosper_logging as p_logging
+import prosper.common.prosper_config as p_config
 
 
 class ProsperApplication(cli.Application):
@@ -21,7 +21,7 @@ class ProsperApplication(cli.Application):
     )
 
     def __new__(cls, *args, **kwargs):
-        """wrapper for ensuring expected functions"""
+        """wrapper for ensuring expected variables"""
         if not hasattr(cls, 'config_path'):
             raise NotImplementedError(
                 '`config_path` required path to default .cfg file'
@@ -47,16 +47,47 @@ class ProsperApplication(cli.Application):
         print(base_config)
         exit()
 
+    _logger = None
     @property
     def logger(self):
-        """builds a logger on-demand when first called"""
-        pass
+        """uses "global logger" for logging"""
+        if self._logger:
+            return self._logger
+        else:
+            log_builder = p_logging.ProsperLogger(
+                self.PROGNAME,
+                self.config.get('LOGGING', 'log_path'),
+                config_obj=self.config
+            )
 
+            if self.debug:
+                log_builder.configure_debug_logger()
+            else:
+                id_string = '({platform}--{version})'.format(
+                    platform=platform.node(),
+                    version=self.VERSION
+                )
+                if self.config.get('LOGGING', 'discord_webhook'):
+                    log_builder.configure_discord_logger(
+                        custom_args=id_string
+                    )
+                if self.config.get('LOGGING', 'slack_webhook'):
+                    log_builder.configure_slack_logger(
+                        custom_args=id_string
+                    )
+
+            self._logger = log_builder.get_logger()
+            return self._logger
+
+    _config = None
     @property
     def config(self):
-        """builds a ProsperConfig object on-demand when first called"""
-        pass
-
+        """uses "global config" for cfg"""
+        if self._config:
+            return self._config
+        else:
+            self._config = p_config.ProsperConfig(self.config_path)
+            return self._config
 
 class ProsperTESTApplication(ProsperApplication):
     """test wrapper for CLI tests"""
@@ -70,7 +101,7 @@ class ProsperTESTApplication(ProsperApplication):
 
     def main(self):
         """do stuff"""
-        print('hello world')
+        self.logger.info('HELLO WORLD')
 
 if __name__ == '__main__':
     ProsperTESTApplication.run()  # test hook
