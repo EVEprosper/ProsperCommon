@@ -285,11 +285,10 @@ def test_discord_logger(config=TEST_CONFIG):
     discord_helper = prosper_logging.DiscordWebhook()
     discord_helper.webhook(DISCORD_WEBHOOK) #TODO: add blank-webhook test
 
-    request_POST_endpoint = REQUEST_POST_ENDPOINT.\
-        format(
-            serverid=discord_helper.serverid,
-            api_key=discord_helper.api_key
-        )
+    request_POST_endpoint = REQUEST_POST_ENDPOINT.format(
+        serverid=discord_helper.serverid,
+        api_key=discord_helper.api_key
+    )
 
     log_capture.check(
         (test_logname, 'INFO', 'prosper.common.prosper_logging TEST --INFO--'),
@@ -321,8 +320,8 @@ def test_slack_logger(config=TEST_CONFIG):
 
     log_capture = helper_log_messages(test_logger)
 
-    request_POST_endpoint = SLACK_POST_ENDPOINT.\
-        format(webhook_info=SLACK_WEBHOOK.replace('https://hooks.slack.com', ''))
+    request_POST_endpoint = SLACK_POST_ENDPOINT.format(
+        webhook_info=SLACK_WEBHOOK.replace('https://hooks.slack.com', ''))
 
     log_capture.check(
         (test_logname, 'INFO',     'prosper.common.prosper_logging TEST --INFO--'),
