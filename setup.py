@@ -77,6 +77,8 @@ class PyTest(TestCommand):
         self.pytest_args = [
             'tests',
             '-rx',
+            '-p',
+            'no:logging',
             '--cov=prosper/' + __library_name__,
             '--cov-report=term-missing',
             '--cov-config=.coveragerc'
@@ -137,7 +139,7 @@ setup(
         'plumbum'
     ],
     tests_require=[
-        'pytest',
+        'pytest>=3.3.0',
         'testfixtures',
         'pytest_cov',
         'mock',
