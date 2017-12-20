@@ -75,6 +75,10 @@ class ProsperApplication(cli.Application):
                     log_builder.configure_slack_logger(
                         custom_args=id_string
                     )
+                if self.config.get('LOGGING', 'hipchat_webhook'):
+                    log_builder.configure_hipchat_logger(
+                        custom_args=id_string
+                    )
 
             self._logger = log_builder.get_logger()
             return self._logger
