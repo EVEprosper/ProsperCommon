@@ -169,6 +169,22 @@ def test_slack_webhook(config_override=TEST_CONFIG):
 
     test_handler.send_msg_to_webhook(test_payload, 'dummy message')
 
+HIPCHAT_WEBHOOK = TEST_CONFIG.get_option('LOGGING', 'hipchat_webhook', None)
+@pytest.mark.loud
+def test_hipchat_webhook(config_override=TEST_CONFIG):
+    """push 'hello world' message through Slack webhook"""
+    if not HIPCHAT_WEBHOOK:
+        pytest.skip('hipchat_webhook is blank')
+
+    test_payload = {
+        'color': 'green',
+        'notify': False,
+        'message_format': 'text'
+    }
+    test_handler = prosper_logging.HackyHipChatHandler(HIPCHAT_WEBHOOK)
+
+    test_handler.send_msg_to_webhook(test_payload, 'dummy message')
+
 def test_logpath_builder_positive(config=TEST_CONFIG):
     """Make sure test_logpath() function has expected behavior -- affermative case
 
@@ -330,6 +346,49 @@ def test_slack_logger(config=TEST_CONFIG):
         (REQUEST_LOGNAME, 'DEBUG', request_POST_endpoint),
         (test_logname, 'ERROR',    'prosper.common.prosper_logging TEST --ERROR--'),
         (REQUEST_LOGNAME, 'DEBUG', SLACK_NEW_CONNECTION),
+        (REQUEST_LOGNAME, 'DEBUG', request_POST_endpoint),
+        (test_logname, 'CRITICAL', 'prosper.common.prosper_logging TEST --CRITICAL--'),
+    )
+
+HIPCHAT_NEW_CONNECTION = TEST_CONFIG.get_option('TEST', 'hipchat_new_connection', None)
+HIPCHAT_POST_ENDPOINT = TEST_CONFIG.get_option('TEST', 'hipchat_POST_endpoint', None)
+HIPCHAT_HOSTNAME = TEST_CONFIG.get_option('TEST', 'hipchat_hostname', None)
+HIPCHAT_PORT = TEST_CONFIG.get_option('TEST', 'hipchat_port', None)
+#HIPCHAT_NEW_CONNECTION = HIPCHAT_NEW_CONNECTION.format(hipchat_hostname=HIPCHAT_HOSTNAME)
+@pytest.mark.loud
+def test_hipchat_logger(config=TEST_CONFIG):
+    """Execute LogCapture on Slack logger object"""
+    if not HIPCHAT_WEBHOOK:
+        pytest.skip('hipchat_webhook is blank')
+
+    test_logname = 'hipchat_logger'
+    log_builder = prosper_logging.ProsperLogger(
+        test_logname,
+        LOG_PATH,
+        config_obj=config
+    )
+    log_builder.configure_hipchat_logger(HIPCHAT_WEBHOOK)
+    test_logger = log_builder.get_logger()
+
+    log_capture = helper_log_messages(test_logger)
+
+    request_POST_endpoint = HIPCHAT_POST_ENDPOINT.format(
+        hipchat_hostname=HIPCHAT_HOSTNAME,
+        hipchat_port=HIPCHAT_PORT,
+        webhook_info=HIPCHAT_WEBHOOK.replace(HIPCHAT_HOSTNAME, '')
+    )
+    new_connection_message = HIPCHAT_NEW_CONNECTION\
+        .format(
+            hipchat_hostname=HIPCHAT_HOSTNAME)\
+        .replace('https://', '')
+
+    log_capture.check(
+        (test_logname, 'INFO',     'prosper.common.prosper_logging TEST --INFO--'),
+        (test_logname, 'WARNING',  'prosper.common.prosper_logging TEST --WARNING--'),
+        (REQUEST_LOGNAME, 'DEBUG', new_connection_message),
+        (REQUEST_LOGNAME, 'DEBUG', request_POST_endpoint),
+        (test_logname, 'ERROR',    'prosper.common.prosper_logging TEST --ERROR--'),
+        (REQUEST_LOGNAME, 'DEBUG', new_connection_message),
         (REQUEST_LOGNAME, 'DEBUG', request_POST_endpoint),
         (test_logname, 'CRITICAL', 'prosper.common.prosper_logging TEST --CRITICAL--'),
     )
