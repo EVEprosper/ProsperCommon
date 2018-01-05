@@ -56,7 +56,7 @@ class ProsperApplication(cli.Application):
         else:
             log_builder = p_logging.ProsperLogger(
                 self.PROGNAME,
-                self.config.get('LOGGING', 'log_path'),
+                self.config.get_option('LOGGING', 'log_path'),
                 config_obj=self.config
             )
 
