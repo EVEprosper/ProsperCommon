@@ -15,10 +15,12 @@ FAKE_CONFIGS = {
     'GUNICORN_FAKE2': 'threadded'
 }
 
-for config_key, config_value in FAKE_CONFIGS.items():
-    environ[config_key] = config_value
-    atexit.register(cleanup_configs, config_key)
-
 def cleanup_configs(config_key):
     """atexit handle that cleans up environ at end-of-test"""
     del environ[config_key]
+
+for config_key, config_value in FAKE_CONFIGS.items():
+    environ[config_key] = str(config_value)
+    atexit.register(cleanup_configs, config_key)
+
+
