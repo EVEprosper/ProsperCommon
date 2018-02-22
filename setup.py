@@ -33,7 +33,7 @@ def hack_find_packages(include_str):
     setuptools.find_packages(path='') doesn't work as intended
 
     Returns:
-        (:obj:`list` :obj:`str`) append <include_str>. onto every element of setuptools.find_pacakges() call
+        list: append <include_str>. onto every element of setuptools.find_pacakges() call
 
     """
     new_list = [include_str]
@@ -49,7 +49,7 @@ def include_all_subfiles(*args):
         Not recursive, only includes flat files
 
     Returns:
-        (:obj:`list` :obj:`str`) list of all non-directories in a file
+        list: list of all non-directories in a file
 
     """
     file_list = []
@@ -70,7 +70,7 @@ class PyTest(TestCommand):
     http://doc.pytest.org/en/latest/goodpractices.html#manual-integration
 
     """
-    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
+    user_options = [('pytest-args=', 'a', 'Arguments to pass to pytest')]
 
     def initialize_options(self):
         TestCommand.initialize_options(self)
@@ -81,25 +81,22 @@ class PyTest(TestCommand):
             'no:logging',
             '--cov=prosper/' + __library_name__,
             '--cov-report=term-missing',
-            '--cov-config=.coveragerc'
-        ]    #load defaults here
+            '--cov-config=.coveragerc',
+        ]
 
     def run_tests(self):
         import shlex
-        #import here, cause outside the eggs aren't loaded
         import pytest
         pytest_commands = []
-        try:    #read commandline
+        try:
             pytest_commands = shlex.split(self.pytest_args)
-        except AttributeError:  #use defaults
+        except AttributeError:
             pytest_commands = self.pytest_args
         errno = pytest.main(pytest_commands)
         exit(errno)
 
 class QuietTest(PyTest):
     """overrides to prevent webhook spam while developing"""
-    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
-
     def initialize_options(self):
         TestCommand.initialize_options(self)
         self.pytest_args = [
@@ -109,7 +106,7 @@ class QuietTest(PyTest):
             'not loud',
             '--cov=prosper/' + __library_name__,
             '--cov-report=term-missing',
-            '--cov-config=.coveragerc'
+            '--cov-config=.coveragerc',
         ]
 
 with open('README.rst', 'r', 'utf-8') as f:
@@ -131,19 +128,24 @@ setup(
     packages=hack_find_packages('prosper'),
     include_package_data=True,
     package_data={
-        '': ['LICENSE', 'README.rst']
+        '': ['LICENSE', 'README.rst'],
+    },
+    entry_points={
+        'console_scripts': [
+            'make_gunicorn_config=prosper.common.flask_utils:make_gunicorn_config',
+        ],
     },
     install_requires=[
         'requests',
         'semantic_version',
-        'plumbum'
+        'plumbum',
     ],
     tests_require=[
         'pytest>=3.3.0',
         'testfixtures',
         'pytest_cov',
         'mock',
-        'yolk3k'
+        'yolk3k',
     ],
     extras_require={
         'dev':[
@@ -153,6 +155,6 @@ setup(
     },
     cmdclass={
         'test':PyTest,
-        'quiettest': QuietTest
-    }
+        'quiettest': QuietTest,
+    },
 )
