@@ -155,6 +155,6 @@ setup(
     },
     cmdclass={
         'test':PyTest,
-        'quiettest': QuietTest,
+        'quiet': QuietTest,
     },
 )
