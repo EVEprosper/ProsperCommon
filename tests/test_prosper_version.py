@@ -75,6 +75,10 @@ def test_read_git_tags_default():
 def test_read_git_tags_happypath():
     """validate version matches expectation"""
 
+    tag_version = semantic_version.Version(p_version._read_git_tags())
+    if tag_version.prerelease:
+        pytest.xfail('PyPI prerelease formatting not compatable with `semantic_version`')
+
     released_versions_report = check_output(['yolk', '-V', 'prospercommon']).splitlines()
 
     released_versions = []
@@ -83,7 +87,6 @@ def test_read_git_tags_happypath():
 
     current_version = max([semantic_version.Version(line) for line in released_versions])
 
-    tag_version = semantic_version.Version(p_version._read_git_tags())
 
     tag_status = tag_version <= current_version   #expect equal-to or less-than current release
 
