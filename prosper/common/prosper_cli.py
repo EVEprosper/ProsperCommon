@@ -32,14 +32,14 @@ class ProsperApplication(cli.Application):
         ['--config'],
         str,
         help='Override default config')
-    def override_config(self, config_path):
+    def override_config(self, config_path):  # pragma: no cover
         """override config object with local version"""
         self.config_path = config_path
 
     @cli.switch(
         ['--dump-config'],
         help='Dump default config to stdout')
-    def dump_config(self):
+    def dump_config(self):  # pragma: no cover
         """dumps configfile to stdout so users can edit/implement their own"""
         with open(self.config_path, 'r') as cfg_fh:
             base_config = cfg_fh.read()
@@ -93,7 +93,7 @@ class ProsperApplication(cli.Application):
             self._config = p_config.ProsperConfig(self.config_path)
             return self._config
 
-class ProsperTESTApplication(ProsperApplication):
+class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
     """test wrapper for CLI tests"""
     from os import path
     PROGNAME = 'CLITEST'
@@ -107,5 +107,5 @@ class ProsperTESTApplication(ProsperApplication):
         """do stuff"""
         self.logger.info('HELLO WORLD')
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     ProsperTESTApplication.run()  # test hook
