@@ -102,6 +102,8 @@ class QuietTest(PyTest):
         self.pytest_args = [
             'tests',
             '-rx',
+            '-p',
+            'no:logging',
             '-m',
             'not loud',
             '--cov=prosper/' + __library_name__,
