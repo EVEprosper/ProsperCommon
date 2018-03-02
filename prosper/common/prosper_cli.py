@@ -67,15 +67,15 @@ class ProsperApplication(cli.Application):
                     platform=platform.node(),
                     version=self.VERSION
                 )
-                if self.config.get('LOGGING', 'discord_webhook'):
+                if self.config.get_option('LOGGING', 'discord_webhook'):
                     log_builder.configure_discord_logger(
                         custom_args=id_string
                     )
-                if self.config.get('LOGGING', 'slack_webhook'):
+                if self.config.get_option('LOGGING', 'slack_webhook'):
                     log_builder.configure_slack_logger(
                         custom_args=id_string
                     )
-                if self.config.get('LOGGING', 'hipchat_webhook'):
+                if self.config.get_option('LOGGING', 'hipchat_webhook'):
                     log_builder.configure_hipchat_logger(
                         custom_args=id_string
                     )
