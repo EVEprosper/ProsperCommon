@@ -10,21 +10,20 @@ import warnings
 
 import semantic_version
 
-import prosper.common.exceptions as exceptions
+from . import exceptions
 
 DEFAULT_VERSION = '0.0.0'
-DEFAULT_BRANCH = 'master'
 TEST_MODE = False
 
 def get_version(
         here_path,
-        default_version=DEFAULT_VERSION
+        default_version=DEFAULT_VERSION,
 ):
     """tries to resolve version number
 
     Args:
         here_path (str): path to project local dir
-        default_version (str, optional): what version to return if all else fails
+        default_version (str): what version to return if all else fails
 
     Returns:
         str: semantic_version information for library
@@ -59,7 +58,7 @@ def get_version(
 
 def _read_git_tags(
         default_version=DEFAULT_VERSION,
-        git_command=['git', 'tag']
+        git_command=('git', 'tag'),
 ):
     """tries to find current git tag
 
@@ -67,19 +66,19 @@ def _read_git_tags(
         git_command exposed for testing null case
 
     Args:
-        default_version (str, optional): what version to make
-        git_command (:obj:`list`, optional): subprocess command
+        default_version (str): what version to make
+        git_command (:obj:`list`): subprocess command
 
     Retruns:
         str: latest version found, or default
 
-    Raises:
+    Warns:
         exceptions.ProsperDefaultVersionWarning: git version not found
 
     """
-    try:  # pragma: no cover
+    try:
         current_tags = check_output(git_command).splitlines()
-    except Exception:
+    except Exception:  # pragma: no cover
         raise
 
     if not current_tags[0]:
@@ -103,13 +102,13 @@ def _read_git_tags(
 
 def _version_from_file(
         path_to_version,
-        default_version=DEFAULT_VERSION
+        default_version=DEFAULT_VERSION,
 ):
     """for PyPI installed versions, just get data from file
 
     Args:
         path_to_version (str): abspath to dir where version.txt exists
-        default_version (str, optional): fallback version in case of error
+        default_version (str): fallback version in case of error
 
     Returns:
         str: current working version

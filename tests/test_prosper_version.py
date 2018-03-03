@@ -7,6 +7,7 @@ from codecs import decode
 from os import path
 import os
 import shutil
+import sys
 from subprocess import check_output
 
 import pytest
@@ -135,8 +136,12 @@ def test_version_installed_as_dep():
     # Prep a dummy version
     virtualenv_name = 'DUMMY_VENV'
     dummy_version = '9.9.9'
+    python_version = 'python{major}.{minor}'.format(
+        major=sys.version_info[0],
+        minor=sys.version_info[1]
+    )
     virtualenv_path = path.join(
-        HERE, virtualenv_name, 'lib/python3.6/site-packages/prosper/common')
+        HERE, virtualenv_name, 'lib', python_version, 'site-packages/prosper/common')
     os.makedirs(virtualenv_path, exist_ok=True)
     with open(path.join(virtualenv_path, 'version.txt'), 'w') as dummy_fh:
         dummy_fh.write(dummy_version)

@@ -125,7 +125,7 @@ class TestCLI:
     def test_happypath(self):
         """validate output is output"""
         # TODO: test isn't working, but OK?
-        result = self.cli('-v')
+        result = self.cli('--verbose')
         if not result:
             pytest.xfail('expected output?  `{}`'.format(result))
 

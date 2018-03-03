@@ -148,6 +148,7 @@ setup(
         'pytest_cov',
         'mock',
         'yolk3k',
+        'coverage',
     ],
     extras_require={
         'dev':[
