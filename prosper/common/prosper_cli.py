@@ -1,4 +1,5 @@
 """Plumbum CLI wrapper for easier/common application writing"""
+import os
 import platform
 
 from plumbum import cli
@@ -92,6 +93,53 @@ class ProsperApplication(cli.Application):
         else:
             self._config = p_config.ProsperConfig(self.config_path)
             return self._config
+
+
+class FlaskLauncher(ProsperApplication):
+    """wrapper for launching (DEBUG) Flask apps"""
+    port = cli.SwitchAttr(
+        ['p', '--port'],
+        int,
+        help='port to launch Flask app on',
+        default=int(os.environ.get('PROSPER_FLASK__port', 8000)),
+    )
+    threaded = cli.SwitchAttr(
+        ['t', '--threaded'],
+        bool,
+        help='Launch Werkzeug in threaded mode',
+        default=os.environ.get('PROSPER_FLASK__threadded', False),
+    )
+    workers = cli.SwitchAttr(
+        ['w', '--workers'],
+        int,
+        help='Launch Werkzeug with multiple worker threads',
+        default=int(os.environ.get('PROSPER_FLASK__workers', 1)),
+    )
+
+    def get_host(self):
+        """returns appropriate host configuration
+
+        Returns:
+            str: host IP (127.0.0.1 or 0.0.0.0)
+
+        """
+        if self.debug:
+            return '127.0.0.1'
+        else:
+            return '0.0.0.0'
+
+    def notify_launch(self, log_level='ERROR'):
+        """logs launcher message before startup
+
+        Args:
+            log_level (str): level to notify at
+
+        """
+        if not self.debug:
+            self.logger.log('LAUNCHING %s -- %s', self.PROGNAME, platform.node())
+
+        self.logger.info('OPTIONS: %s', self.__dict__)
+
 
 class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
     """test wrapper for CLI tests"""

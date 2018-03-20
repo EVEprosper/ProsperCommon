@@ -9,6 +9,7 @@ from os import path
 
 import pytest
 from plumbum import local
+from testfixtures import LogCapture
 
 import prosper.common.prosper_cli as p_cli
 import prosper.common.prosper_config as p_config
@@ -116,6 +117,33 @@ class TestMetaClasses:
 
         dummy = DummyApplication(__file__)
         assert isinstance(dummy.config, p_config.ProsperConfig)
+
+
+class TestFlaskLauncher:
+    """validate meta behavior of FlaskLauncher framework"""
+    class DummyFlaskLauncher(p_cli.FlaskLauncher):
+        PROGNAME = 'FLASK_LAUNCHER'
+        VERSION = '0.0.0'
+
+        here_path = HERE
+        config_path = LOCAL_CONFIG_PATH
+
+        def main(self):
+            print('yes!')
+
+
+    def test_get_host(self):
+        """validate get_host method"""
+        dummy = self.DummyFlaskLauncher(__file__)
+        dummy.debug = True
+        assert dummy.get_host() == '127.0.0.1'
+
+        dummy.debug = False
+        assert dummy.get_host() == '0.0.0.0'
+
+    def test_notify_launch(self):
+        """validate notify_launch method"""
+        pass
 
 class TestCLI:
     """validate basic args work as expected"""
