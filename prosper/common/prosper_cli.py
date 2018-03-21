@@ -166,19 +166,6 @@ class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
         """do stuff"""
         self.logger.info('HELLO WORLD')
 
-class TESTFlaskLauncher(FlaskLauncher):
-    from os import path
-    PROGNAME = 'FLASK_TEST'
-    VERSION = '0.0.0'
-
-    HERE = path.abspath(path.dirname(__file__))
-
-    config_path = path.join(HERE, 'common_config.cfg')
-
-    def main(self):
-        """do stuff"""
-        self.logger.info('HELLO WORLD')
-        self.notify_launch()
 
 if __name__ == '__main__':  # pragma: no cover
     ProsperTESTApplication.run()  # test hook
