@@ -1,6 +1,8 @@
 """Plumbum CLI wrapper for easier/common application writing"""
+import logging
 import os
 import platform
+import pprint
 
 from plumbum import cli
 
@@ -94,7 +96,9 @@ class ProsperApplication(cli.Application):
             self._config = p_config.ProsperConfig(self.config_path)
             return self._config
 
-
+OPTION_ARGS = (
+    'debug', 'port', 'threaded', 'workers'
+)
 class FlaskLauncher(ProsperApplication):
     """wrapper for launching (DEBUG) Flask apps"""
     port = cli.SwitchAttr(
@@ -136,9 +140,16 @@ class FlaskLauncher(ProsperApplication):
 
         """
         if not self.debug:
-            self.logger.log('LAUNCHING %s -- %s', self.PROGNAME, platform.node())
+            self.logger.log(
+                logging.getLevelName(log_level),
+                'LAUNCHING %s -- %s', self.PROGNAME, platform.node()
+            )
+        flask_options = {
+            key: getattr(self, key) for key in OPTION_ARGS
+        }
+        flask_options['host'] = self.get_host()
 
-        self.logger.info('OPTIONS: %s', self.__dict__)
+        self.logger.info('OPTIONS: %s', flask_options)
 
 
 class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
@@ -154,6 +165,20 @@ class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
     def main(self):
         """do stuff"""
         self.logger.info('HELLO WORLD')
+
+class TESTFlaskLauncher(FlaskLauncher):
+    from os import path
+    PROGNAME = 'FLASK_TEST'
+    VERSION = '0.0.0'
+
+    HERE = path.abspath(path.dirname(__file__))
+
+    config_path = path.join(HERE, 'common_config.cfg')
+
+    def main(self):
+        """do stuff"""
+        self.logger.info('HELLO WORLD')
+        self.notify_launch()
 
 if __name__ == '__main__':  # pragma: no cover
     ProsperTESTApplication.run()  # test hook

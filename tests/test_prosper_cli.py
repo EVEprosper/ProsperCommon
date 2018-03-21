@@ -129,7 +129,10 @@ class TestFlaskLauncher:
         config_path = LOCAL_CONFIG_PATH
 
         def main(self):
-            print('yes!')
+            self.verbose = True
+            self.logger('hello_world')
+
+            self.notify_launch()
 
 
     def test_get_host(self):
@@ -141,9 +144,6 @@ class TestFlaskLauncher:
         dummy.debug = False
         assert dummy.get_host() == '0.0.0.0'
 
-    def test_notify_launch(self):
-        """validate notify_launch method"""
-        pass
 
 class TestCLI:
     """validate basic args work as expected"""
