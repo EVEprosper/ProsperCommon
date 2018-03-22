@@ -7,6 +7,10 @@ Help create uniform templates and reduce boilerplate, PropsperCLI gives a common
 Using prosper_cli
 =================
 
+
+**Generic CLI**
+---------------------
+
 .. code-block:: python
 
     """my_app.py"""

@@ -130,7 +130,7 @@ class ProsperConfig(object):
         local_option = None
         try:
             local_option = self.local_config[section_name][key_name]
-        except KeyError:
+        except (KeyError, configparser.NoOptionError, configparser.NoSectionError):
             self.logger.debug(section_info + 'not found in local config')
         if local_option:
             self.logger.debug('-- using local config')
@@ -139,7 +139,7 @@ class ProsperConfig(object):
         global_option = None
         try:
             global_option = self.global_config[section_name][key_name]
-        except KeyError:# as error_msg:
+        except (KeyError, configparser.NoOptionError, configparser.NoSectionError):
             self.logger.warning(section_info + 'not found in global config')
         if global_option:
             self.logger.debug('-- using global config')

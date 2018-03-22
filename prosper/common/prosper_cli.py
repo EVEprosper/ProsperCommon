@@ -96,11 +96,13 @@ class ProsperApplication(cli.Application):
             self._config = p_config.ProsperConfig(self.config_path)
             return self._config
 
+
 OPTION_ARGS = (
     'debug', 'port', 'threaded', 'workers'
 )
 class FlaskLauncher(ProsperApplication):
     """wrapper for launching (DEBUG) Flask apps"""
+
     port = cli.SwitchAttr(
         ['p', '--port'],
         int,
@@ -119,6 +121,7 @@ class FlaskLauncher(ProsperApplication):
         help='Launch Werkzeug with multiple worker threads',
         default=int(os.environ.get('PROSPER_FLASK__workers', 1)),
     )
+
 
     def get_host(self):
         """returns appropriate host configuration
@@ -166,6 +169,20 @@ class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
         """do stuff"""
         self.logger.info('HELLO WORLD')
 
+class TESTFlaskLauncher(ProsperApplication):  # pragma: no cover
+    """test wrapper for CLI tests"""
+    from os import path
+    PROGNAME = 'CLITEST'
+    VERSION = '0.0.0'
+
+    HERE = path.abspath(path.dirname(__file__))
+
+    config_path = path.join(HERE, 'common_config.cfg')
+
+    def main(self):
+        """do stuff"""
+        self.logger.info('HELLO WORLD')
+
 
 if __name__ == '__main__':  # pragma: no cover
-    ProsperTESTApplication.run()  # test hook
+    TESTFlaskLauncher.run()  # test hook
