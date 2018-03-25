@@ -31,8 +31,6 @@ def assert_docker(xfail=False, force_retry=False, **kwargs):
         return
 
     if xfail:
-        raise pytest.xfail(
-            'Docker Not available: {!r}'.format(err)  # TODO: this seems bad af
-        )
+        raise pytest.xfail('Docker Not available:')
     else:
-        raise exceptions.DockerNotFound(repr(err))
+        raise exceptions.DockerNotFound()
