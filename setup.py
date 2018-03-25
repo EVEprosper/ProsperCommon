@@ -124,7 +124,8 @@ setup(
     url='https://github.com/EVEprosper/' + __package_name__,
     license='MIT',
     classifiers=[
-        'Programming Language :: Python :: 3.5'
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     keywords='prosper eve-online webhooks logging configuration-management',
     packages=hack_find_packages('prosper'),
@@ -149,12 +150,17 @@ setup(
         'mock',
         'yolk3k',
         'coverage',
+        'docker',
     ],
     extras_require={
         'dev':[
             'sphinx',
             'sphinxcontrib-napoleon',
-        ]
+        ],
+        'test':[
+            'plumbum',
+            'docker',
+        ],
     },
     cmdclass={
         'test':PyTest,

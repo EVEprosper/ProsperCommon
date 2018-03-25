@@ -19,6 +19,12 @@ else:
     which = local['which']
 
 
+def atexit_remove_file(filepath):
+    """atexit handler to remove tempfiles and avoid clutter"""
+    print('ATEXIT removing: ' + path.abspath(filepath))
+    remove(filepath)
+    assert not path.isfile(filepath)
+
 def test_cli():
     """make sure entry_point/console_script does what it says"""
     # TODO: local.cwd() swapping to test dirs
@@ -29,6 +35,7 @@ def test_cli():
     gunicorn_conf()
 
     assert path.isfile('gunicorn.conf')
+    atexit.register(atexit_remove_file, 'gunicorn.conf')
 
 def test_gunicorn_conf():
     """make sure gunicorn contents works as expected"""
@@ -50,3 +57,8 @@ def test_gunicorn_conf():
 
     assert module.test1 == 'hello'
     assert module.test2 == 'world'
+
+    # Sanitize after test
+    del environ['GUNICORN_TEST1']
+    del environ['GUNICORN_TEST2']
+    atexit.register(atexit_remove_file, gunicorn_filename)

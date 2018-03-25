@@ -7,6 +7,13 @@ class ProsperVersionException(ProsperCommonException):
     """base class for prosper.common.version exceptions"""
     pass
 
+class ProsperTestHelpersException(ProsperCommonException):
+    """base class for prosper.common.test_helpers"""
+    pass
+class DockerNotFound(ProsperTestHelpersException):
+    """docker not available in environment"""
+    pass
+
 class ProsperCommonWarning(UserWarning):
     """base class for prosper.common warnings"""
     pass
