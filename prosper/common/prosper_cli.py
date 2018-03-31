@@ -157,27 +157,12 @@ class FlaskLauncher(ProsperApplication):
 
 class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
     """test wrapper for CLI tests"""
-    from os import path
     PROGNAME = 'CLITEST'
     VERSION = '0.0.0'
 
-    HERE = path.abspath(path.dirname(__file__))
+    HERE = os.path.abspath(os.path.dirname(__file__))
 
-    config_path = path.join(HERE, 'common_config.cfg')
-
-    def main(self):
-        """do stuff"""
-        self.logger.info('HELLO WORLD')
-
-class TESTFlaskLauncher(FlaskLauncher):  # pragma: no cover
-    """test wrapper for CLI tests"""
-    from os import path
-    PROGNAME = 'CLITEST'
-    VERSION = '0.0.0'
-
-    HERE = path.abspath(path.dirname(__file__))
-
-    config_path = path.join(HERE, 'common_config.cfg')
+    config_path = os.path.join(HERE, 'common_config.cfg')
 
     def main(self):
         """do stuff"""
@@ -185,4 +170,4 @@ class TESTFlaskLauncher(FlaskLauncher):  # pragma: no cover
 
 
 if __name__ == '__main__':  # pragma: no cover
-    TESTFlaskLauncher.run()  # test hook
+    ProsperTESTApplication.run()  # test hook
