@@ -169,7 +169,7 @@ class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
         """do stuff"""
         self.logger.info('HELLO WORLD')
 
-class TESTFlaskLauncher(ProsperApplication):  # pragma: no cover
+class TESTFlaskLauncher(FlaskLauncher):  # pragma: no cover
     """test wrapper for CLI tests"""
     from os import path
     PROGNAME = 'CLITEST'

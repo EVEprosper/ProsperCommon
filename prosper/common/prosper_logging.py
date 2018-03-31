@@ -652,7 +652,7 @@ class HackySlackHandler(logging.Handler):
             log_msg (str): actual log message
 
         """
-        if SILENCE_OVERRIDE:
+        if SILENCE_OVERRIDE:  # pragma: no cover
             return
 
         payload = {
