@@ -283,21 +283,18 @@ class ProsperLogger(object):
 
         # vv TODO vv: Test review #
         if discord_obj.can_query:
-            try:
-                discord_handler = HackyDiscordHandler(
-                    discord_obj,
-                    discord_recipient
-                )
-                self._configure_common(
-                    'discord_',
-                    log_level,
-                    log_format,
-                    'Discord',
-                    discord_handler,
-                    custom_args=custom_args
-                )
-            except Exception as error_msg:  # FIXME: remove this, if we're just re-throwing?
-                raise error_msg
+            discord_handler = HackyDiscordHandler(
+                discord_obj,
+                discord_recipient
+            )
+            self._configure_common(
+                'discord_',
+                log_level,
+                log_format,
+                'Discord',
+                discord_handler,
+                custom_args=custom_args
+            )
         else:
             warnings.warn(
                 'Unable to execute webhook',
@@ -337,20 +334,17 @@ class ProsperLogger(object):
 
         # Actually build slack logging handler #
         # vv TODO vv: Test review #
-        try:
-            slack_handler = HackySlackHandler(
-                slack_webhook
-            )
-            self._configure_common(
-                'slack_',
-                log_level,
-                log_format,
-                'Slack',
-                slack_handler,
-                custom_args=custom_args
-            )
-        except Exception as error_msg:
-            raise error_msg
+        slack_handler = HackySlackHandler(
+            slack_webhook
+        )
+        self._configure_common(
+            'slack_',
+            log_level,
+            log_format,
+            'Slack',
+            slack_handler,
+            custom_args=custom_args
+        )
         # ^^ TODO ^^ #
 
     def configure_hipchat_logger(
