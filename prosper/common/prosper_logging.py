@@ -31,7 +31,6 @@ import re
 import requests
 
 import prosper.common.prosper_config as p_config
-import prosper.common.prosper_utilities as p_utils
 import prosper.common.exceptions as exceptions
 
 HERE = path.abspath(path.dirname(__file__))
