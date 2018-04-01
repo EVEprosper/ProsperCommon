@@ -5,9 +5,9 @@ Pytest functions for exercising prosper.common.prosper_logging
 """
 
 from os import path, listdir, remove, makedirs, rmdir
-import configparser
 import logging
 from datetime import datetime
+import platform
 from warnings import warn
 
 import pytest
@@ -71,7 +71,8 @@ def test_cleanup_log_directory(
     for log_file in log_list:
         if '.log' in log_file:  #mac adds .DS_Store and gets cranky about deleting
             log_abspath = path.join(LOG_PATH, log_file)
-            remove(log_abspath)
+            if not platform.system() == 'Windows':
+                remove(log_abspath)
 
 def test_rotating_file_handle(config=TEST_CONFIG):
     """Exercise TimedRotatingFileHandler to make sure logs are generating as expected

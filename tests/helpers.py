@@ -1,10 +1,35 @@
 """TEMPORARY: ported config helpers to ProsperTestHelpers"""
-
+import configparser
 from os import path
-import logging
 from datetime import datetime
+import warnings
 
 import prosper.common.prosper_config as p_config
+
+def get_config(
+        config_filepath,
+        local_override=False
+):
+    """DEPRECATED: classic v1 config parser.  Obsolete by v0.3.0"""
+    warnings.warn(
+        __name__ + 'replaced with ProsperConfig',
+        DeprecationWarning
+    )
+    config = configparser.ConfigParser(
+        interpolation=configparser.ExtendedInterpolation(),
+        allow_no_value=True,
+        delimiters=('='),
+        inline_comment_prefixes=('#')
+    )
+
+    real_config_filepath = p_config.get_local_config_filepath(config_filepath)
+
+    if local_override:  #force lookup tracked config
+        real_config_filepath = config_filepath
+
+    with open(real_config_filepath, 'r') as filehandle:
+        config.read_file(filehandle)
+    return config
 
 def compare_config_files(config_filepath):
     """compares prod config file vs local version
@@ -16,8 +41,8 @@ def compare_config_files(config_filepath):
         dict: description of unique keys between both configs
 
     """
-    tracked_config = p_config.get_config(config_filepath, True)
-    local_config = p_config.get_config(config_filepath)
+    tracked_config = get_config(config_filepath, True)
+    local_config = get_config(config_filepath)
 
     unique_values = {}
 
