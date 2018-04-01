@@ -5,9 +5,9 @@ Pytest functions for exercising prosper.common.prosper_logging
 """
 
 from os import path, listdir, remove, makedirs, rmdir
-import configparser
 import logging
 from datetime import datetime
+import platform
 from warnings import warn
 
 import pytest
@@ -71,7 +71,8 @@ def test_cleanup_log_directory(
     for log_file in log_list:
         if '.log' in log_file:  #mac adds .DS_Store and gets cranky about deleting
             log_abspath = path.join(LOG_PATH, log_file)
-            remove(log_abspath)
+            if not platform.system() == 'Windows':
+                remove(log_abspath)
 
 def test_rotating_file_handle(config=TEST_CONFIG):
     """Exercise TimedRotatingFileHandler to make sure logs are generating as expected
@@ -145,7 +146,7 @@ def test_discord_webhook(config_override=TEST_CONFIG):
 
 
     if not DISCORD_WEBHOOK: #FIXME: commenting doesn't work in config file?
-        pytest.skip('discord_webhook is blank')
+        pytest.xfail('discord_webhook is blank')
 
     webhook_obj = prosper_logging.DiscordWebhook()
     webhook_obj.webhook(DISCORD_WEBHOOK)
@@ -158,7 +159,7 @@ SLACK_WEBHOOK = TEST_CONFIG.get_option('LOGGING', 'slack_webhook', None)
 def test_slack_webhook(config_override=TEST_CONFIG):
     """push 'hello world' message through Slack webhook"""
     if not SLACK_WEBHOOK:
-        pytest.skip('slack_webhook is blank')
+        pytest.xfail('slack_webhook is blank')
 
     test_payload = {
         'fallback': 'hello world',
@@ -174,7 +175,7 @@ HIPCHAT_WEBHOOK = TEST_CONFIG.get_option('LOGGING', 'hipchat_webhook', None)
 def test_hipchat_webhook(config_override=TEST_CONFIG):
     """push 'hello world' message through Slack webhook"""
     if not HIPCHAT_WEBHOOK:
-        pytest.skip('hipchat_webhook is blank')
+        pytest.xfail('hipchat_webhook is blank')
 
     test_payload = {
         'color': 'green',
@@ -285,7 +286,7 @@ REQUEST_POST_ENDPOINT  = TEST_CONFIG.get_option('TEST', 'request_POST_endpoint',
 def test_discord_logger(config=TEST_CONFIG):
     """Execute LogCapture on Discord logger object"""
     if not DISCORD_WEBHOOK: #FIXME: commenting doesn't work in config file?
-        pytest.skip('discord_webhook is blank')
+        pytest.xfail('discord_webhook is blank')
 
     test_logname = 'discord_logger'
     log_builder = prosper_logging.ProsperLogger(
@@ -323,7 +324,7 @@ SLACK_POST_ENDPOINT = TEST_CONFIG.get_option('TEST', 'slack_POST_endpoint', None
 def test_slack_logger(config=TEST_CONFIG):
     """Execute LogCapture on Slack logger object"""
     if not SLACK_WEBHOOK:
-        pytest.skip('slack_webhook is blank')
+        pytest.xfail('slack_webhook is blank')
 
     test_logname = 'slack_logger'
     log_builder = prosper_logging.ProsperLogger(
@@ -359,7 +360,7 @@ HIPCHAT_PORT = TEST_CONFIG.get_option('TEST', 'hipchat_port', None)
 def test_hipchat_logger(config=TEST_CONFIG):
     """Execute LogCapture on Slack logger object"""
     if not HIPCHAT_WEBHOOK:
-        pytest.skip('hipchat_webhook is blank')
+        pytest.xfail('hipchat_webhook is blank')
 
     test_logname = 'hipchat_logger'
     log_builder = prosper_logging.ProsperLogger(

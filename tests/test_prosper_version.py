@@ -7,6 +7,7 @@ from codecs import decode
 from os import path
 import os
 import shutil
+import sys
 from subprocess import check_output
 
 import pytest
@@ -75,6 +76,10 @@ def test_read_git_tags_default():
 def test_read_git_tags_happypath():
     """validate version matches expectation"""
 
+    tag_version = semantic_version.Version(p_version._read_git_tags())
+    if tag_version.prerelease:
+        pytest.xfail('PyPI prerelease formatting not compatable with `semantic_version`')
+
     released_versions_report = check_output(['yolk', '-V', 'prospercommon']).splitlines()
 
     released_versions = []
@@ -83,7 +88,6 @@ def test_read_git_tags_happypath():
 
     current_version = max([semantic_version.Version(line) for line in released_versions])
 
-    tag_version = semantic_version.Version(p_version._read_git_tags())
 
     tag_status = tag_version <= current_version   #expect equal-to or less-than current release
 
@@ -95,6 +99,7 @@ def test_read_git_tags_happypath():
         pytest.xfail(
             'Expected release mismatch -- tag={} yolk={}'.format(tag_version, current_version))
         #assert tag_version <= current_version   #expect equal-to or less-than current release
+
 def test_version_from_file_default():
     """validate default version returns from _version_from_file()"""
     with pytest.warns(exceptions.ProsperDefaultVersionWarning):
@@ -131,8 +136,12 @@ def test_version_installed_as_dep():
     # Prep a dummy version
     virtualenv_name = 'DUMMY_VENV'
     dummy_version = '9.9.9'
+    python_version = 'python{major}.{minor}'.format(
+        major=sys.version_info[0],
+        minor=sys.version_info[1]
+    )
     virtualenv_path = path.join(
-        HERE, virtualenv_name, 'lib/python3.6/site-packages/prosper/common')
+        HERE, virtualenv_name, 'lib', python_version, 'site-packages/prosper/common')
     os.makedirs(virtualenv_path, exist_ok=True)
     with open(path.join(virtualenv_path, 'version.txt'), 'w') as dummy_fh:
         dummy_fh.write(dummy_version)

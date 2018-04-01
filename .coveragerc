@@ -1,5 +1,8 @@
 [report]
-    omit = prosper/common/_version.py
+    omit = 
+        prosper/common/_version.py
+        prosper/common/exceptions.py
+        prosper/common/__init__.py
 
 [paths]
     source = prosper/common

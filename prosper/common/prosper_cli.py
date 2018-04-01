@@ -1,4 +1,6 @@
 """Plumbum CLI wrapper for easier/common application writing"""
+import logging
+import os
 import platform
 
 from plumbum import cli
@@ -32,14 +34,14 @@ class ProsperApplication(cli.Application):
         ['--config'],
         str,
         help='Override default config')
-    def override_config(self, config_path):
+    def override_config(self, config_path):  # pragma: no cover
         """override config object with local version"""
         self.config_path = config_path
 
     @cli.switch(
         ['--dump-config'],
         help='Dump default config to stdout')
-    def dump_config(self):
+    def dump_config(self):  # pragma: no cover
         """dumps configfile to stdout so users can edit/implement their own"""
         with open(self.config_path, 'r') as cfg_fh:
             base_config = cfg_fh.read()
@@ -67,15 +69,15 @@ class ProsperApplication(cli.Application):
                     platform=platform.node(),
                     version=self.VERSION
                 )
-                if self.config.get('LOGGING', 'discord_webhook'):
+                if self.config.get_option('LOGGING', 'discord_webhook'):
                     log_builder.configure_discord_logger(
                         custom_args=id_string
                     )
-                if self.config.get('LOGGING', 'slack_webhook'):
+                if self.config.get_option('LOGGING', 'slack_webhook'):
                     log_builder.configure_slack_logger(
                         custom_args=id_string
                     )
-                if self.config.get('LOGGING', 'hipchat_webhook'):
+                if self.config.get_option('LOGGING', 'hipchat_webhook'):
                     log_builder.configure_hipchat_logger(
                         custom_args=id_string
                     )
@@ -93,19 +95,78 @@ class ProsperApplication(cli.Application):
             self._config = p_config.ProsperConfig(self.config_path)
             return self._config
 
-class ProsperTESTApplication(ProsperApplication):
+
+OPTION_ARGS = (
+    'debug', 'port', 'threaded', 'workers'
+)
+class FlaskLauncher(ProsperApplication):
+    """wrapper for launching (DEBUG) Flask apps"""
+
+    port = cli.SwitchAttr(
+        ['p', '--port'],
+        int,
+        help='port to launch Flask app on',
+        default=int(os.environ.get('PROSPER_FLASK__port', 8000)),
+    )
+    threaded = cli.SwitchAttr(
+        ['t', '--threaded'],
+        bool,
+        help='Launch Werkzeug in threaded mode',
+        default=os.environ.get('PROSPER_FLASK__threadded', False),
+    )
+    workers = cli.SwitchAttr(
+        ['w', '--workers'],
+        int,
+        help='Launch Werkzeug with multiple worker threads',
+        default=int(os.environ.get('PROSPER_FLASK__workers', 1)),
+    )
+
+
+    def get_host(self):
+        """returns appropriate host configuration
+
+        Returns:
+            str: host IP (127.0.0.1 or 0.0.0.0)
+
+        """
+        if self.debug:
+            return '127.0.0.1'
+        else:
+            return '0.0.0.0'
+
+    def notify_launch(self, log_level='ERROR'):
+        """logs launcher message before startup
+
+        Args:
+            log_level (str): level to notify at
+
+        """
+        if not self.debug:
+            self.logger.log(
+                logging.getLevelName(log_level),
+                'LAUNCHING %s -- %s', self.PROGNAME, platform.node()
+            )
+        flask_options = {
+            key: getattr(self, key) for key in OPTION_ARGS
+        }
+        flask_options['host'] = self.get_host()
+
+        self.logger.info('OPTIONS: %s', flask_options)
+
+
+class ProsperTESTApplication(ProsperApplication):  # pragma: no cover
     """test wrapper for CLI tests"""
-    from os import path
     PROGNAME = 'CLITEST'
     VERSION = '0.0.0'
 
-    HERE = path.abspath(path.dirname(__file__))
+    HERE = os.path.abspath(os.path.dirname(__file__))
 
-    config_path = path.join(HERE, 'common_config.cfg')
+    config_path = os.path.join(HERE, 'common_config.cfg')
 
     def main(self):
         """do stuff"""
         self.logger.info('HELLO WORLD')
 
-if __name__ == '__main__':
+
+if __name__ == '__main__':  # pragma: no cover
     ProsperTESTApplication.run()  # test hook

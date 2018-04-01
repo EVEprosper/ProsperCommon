@@ -9,7 +9,7 @@ import json
 import pytest
 
 import prosper.common.prosper_config as prosper_config
-import prosper.common.prosper_utilities as prosper_utilities
+import helpers
 
 HERE = path.abspath(path.dirname(__file__))
 ROOT = path.dirname(HERE)
@@ -88,7 +88,7 @@ def test_local_filepath_helper():
 
 def test_config_file():
     """Test makes sure tracked/local configs have all matching keys"""
-    unique_values = prosper_utilities.compare_config_files(LOCAL_CONFIG_PATH)
+    unique_values = helpers.compare_config_files(LOCAL_CONFIG_PATH)
 
     message = ''
     if unique_values:

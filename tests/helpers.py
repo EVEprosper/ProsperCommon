@@ -1,13 +1,35 @@
-'''utilities.py: worker functions for CREST calls'''
-
+"""TEMPORARY: ported config helpers to ProsperTestHelpers"""
+import configparser
 from os import path
-import logging
 from datetime import datetime
+import warnings
 
-from prosper.common.prosper_config import get_config, get_local_config_filepath
+import prosper.common.prosper_config as p_config
 
-DEFAULT_LOGGER = logging.getLogger('NULL')
-DEFAULT_LOGGER.addHandler(logging.NullHandler())
+def get_config(
+        config_filepath,
+        local_override=False
+):
+    """DEPRECATED: classic v1 config parser.  Obsolete by v0.3.0"""
+    warnings.warn(
+        __name__ + 'replaced with ProsperConfig',
+        DeprecationWarning
+    )
+    config = configparser.ConfigParser(
+        interpolation=configparser.ExtendedInterpolation(),
+        allow_no_value=True,
+        delimiters=('='),
+        inline_comment_prefixes=('#')
+    )
+
+    real_config_filepath = p_config.get_local_config_filepath(config_filepath)
+
+    if local_override:  #force lookup tracked config
+        real_config_filepath = config_filepath
+
+    with open(real_config_filepath, 'r') as filehandle:
+        config.read_file(filehandle)
+    return config
 
 def compare_config_files(config_filepath):
     """compares prod config file vs local version
@@ -16,7 +38,7 @@ def compare_config_files(config_filepath):
         config_filepath (str): path to config file
 
     Returns:
-        (:obj:`dict`) description of unique keys between both configs
+        dict: description of unique keys between both configs
 
     """
     tracked_config = get_config(config_filepath, True)
@@ -24,7 +46,7 @@ def compare_config_files(config_filepath):
 
     unique_values = {}
 
-    if not path.isfile(get_local_config_filepath(config_filepath)): #pragma: no cover
+    if not path.isfile(p_config.get_local_config_filepath(config_filepath)): #pragma: no cover
         #pytest.skip('no local .cfg found, skipping')
         return None
 
@@ -65,8 +87,8 @@ def find_unique_keys(base_config, comp_config, base_name):
         base_name (str): name to tag mismatches with
 
     Returns:
-        (:obj:`list`): unique sections from ConfigParser
-        (:obj:`list`): unique keys from ConfigParser sections
+        list: unique sections from ConfigParser
+        list: unique keys from ConfigParser sections
 
     """
     unique_keys = []
