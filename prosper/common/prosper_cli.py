@@ -47,7 +47,16 @@ class ProsperApplication(cli.Application):
             base_config = cfg_fh.read()
 
         print(base_config)
-        exit()
+        exit(2)
+
+    @cli.switch(
+        ['--secret-cfg'],
+        cli.ExistingFile,
+        help='Secrets .ini file for jinja2 template'
+    )
+    def load_secrets(self, secret_path):
+        """render secrets into config object"""
+        self._config = p_config.render_secrets(self.config_path, secret_path)
 
     _logger = None
     @property

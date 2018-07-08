@@ -14,10 +14,10 @@ def get_version(package_name):
     """find __version__ for making package
 
     Args:
-        package_path (str): path to _version.py folder (abspath > relpath)
+        package_name (str): path to _version.py folder (abspath > relpath)
 
     Returns:
-        (str) __version__ value
+        str: __version__ value
 
     """
     module = 'prosper.' + package_name + '._version'
@@ -139,6 +139,8 @@ setup(
         ],
     },
     install_requires=[
+        'anyconfig',
+        'anytemplate',
         'requests',
         'semantic_version',
         'plumbum',

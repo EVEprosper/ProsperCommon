@@ -7,8 +7,42 @@ Unified config parsing and option picking against config objects
 from os import path, getenv
 import configparser
 from configparser import ExtendedInterpolation
-import warnings
 import logging
+
+import anyconfig
+import anytemplate
+
+
+def render_secrets(
+        config_path,
+        secret_path,
+):
+    """combine a jinja template with a secret .ini file
+
+    Args:
+        config_path (str): path to .cfg file with jinja templating
+        secret_path (str): path to .ini-like secrets file
+
+    Returns:
+        ProsperConfig: rendered configuration object
+
+    """
+    with open(secret_path, 'r') as s_fh:
+        secret_ini = anyconfig.load(s_fh, ac_parser='ini')
+
+    with open(config_path, 'r') as c_fh:
+        raw_cfg = c_fh.read()
+
+    rendered_cfg = anytemplate.renders(raw_cfg, secret_ini, at_engine='jinja2')
+
+    p_config = ProsperConfig(config_path)
+    local_config = configparser.ConfigParser()
+    local_config.optionxform = str
+    local_config.read_string(rendered_cfg)
+
+    p_config.local_config = local_config
+
+    return p_config
 
 
 class ProsperConfig(object):

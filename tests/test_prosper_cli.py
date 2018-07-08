@@ -169,7 +169,7 @@ class TestCLI:
 
     def test_dump_config(self):
         """validate --dump-config works as expected"""
-        result = self.cli('--dump-config')
+        retcode, result, stderr = self.cli.run(['--dump-config'], retcode=2)
 
         config = configparser.ConfigParser()
         config.read_string(result)
