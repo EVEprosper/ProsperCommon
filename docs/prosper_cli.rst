@@ -71,7 +71,8 @@ Using prosper_cli
      
 Meant to be used with `ProsperCookiecutters`_ for debug launching Flask apps.  
 
------
+CLI Features
+------------
 
 By using the Prosper framework, the following is handled automatically:
 
@@ -80,11 +81,25 @@ By using the Prosper framework, the following is handled automatically:
 - ``-v``/``--verbose`` bool for enabling STDOUT logging
 - ``--config`` for loading a custom config file
 - ``--dump-config`` for dumping default config to STDOUT
+- ``--secret-cfg`` for using a jinja2 template secret-keeping style
 - ``self.logger`` and ``self.config`` loaded automagically
 - Full ``ProsperLogging`` support
     - Slack and Discord support if webhooks are provided by config
     - Standardized log formatting
     - Platform and version information for webhook loggers
+
+Secret Config
+~~~~~~~~~~~~~
+
+Sometimes having a secrets file is preferrable to using environment variables.  This allows secrets to be more easily passed as keys.
+
+.. code-block:: cfg
+
+# credentials.ini
+[key]
+    value_1 = secret
+    value_2 = secret
+
 
 .. _Plumbum: http://plumbum.readthedocs.io/en/latest/cli.html
 .. _ProsperCookiecutters: https://github.com/EVEprosper/ProsperCookiecutters
