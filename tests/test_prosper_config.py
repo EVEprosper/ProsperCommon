@@ -29,6 +29,18 @@ def test_setup_environment():
     expected_val = prosper_config.get_value_from_environment('TEST', 'dummy_val')
     assert expected_val == ENV_TEST_1
 
+def test_render_secrets():
+    """happypath test for p_config.render_secrets"""
+    config_path = path.join(HERE, 'test_config.cfg.j2')
+    secret_path = path.join(HERE, 'test_secret.ini')
+
+    config = prosper_config.render_secrets(config_path, secret_path)
+
+    assert isinstance(config, prosper_config.ProsperConfig)
+    assert config.get_option('TEST', 'secret') == 'butts'
+    os.environ['PROSPER_LOCAL__hello'] = 'world'
+    assert config.get_option('LOCAL', 'hello') == 'world'
+
 TEST_BAD_CONFIG_PATH = path.join(HERE, 'bad_config.cfg')
 TEST_BAD_PATH = path.join(HERE, 'no_file_here.cfg')
 def test_bad_config():

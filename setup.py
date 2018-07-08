@@ -141,9 +141,10 @@ setup(
     install_requires=[
         'anyconfig',
         'anytemplate',
+        'jinja2',
+        'plumbum',
         'requests',
         'semantic_version',
-        'plumbum',
     ],
     tests_require=[
         'pytest>=3.3.0',

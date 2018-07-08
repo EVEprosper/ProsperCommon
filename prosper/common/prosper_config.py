@@ -288,7 +288,8 @@ def get_local_config_filepath(
         str: Path to local config, or global if path DNE
 
     """
-    local_config_filepath = config_filepath.replace('.cfg', '_local.cfg')
+    local_config_name = path.basename(config_filepath).split('.')[0] + '_local.cfg'
+    local_config_filepath = path.join(path.split(config_filepath)[0], local_config_name)
 
     real_config_filepath = ''
     if path.isfile(local_config_filepath) or force_local:
