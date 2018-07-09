@@ -8,11 +8,12 @@ from os import path, getenv
 import configparser
 from configparser import ExtendedInterpolation
 import logging
+import re
 
 import anyconfig
 import anytemplate
 
-
+JINJA_PATTERN = re.compile(r'.*{{\S*}}.*')
 def render_secrets(
         config_path,
         secret_path,
@@ -44,6 +45,36 @@ def render_secrets(
 
     return p_config
 
+def check_value(
+        config,
+        section,
+        option,
+        jinja_pattern=JINJA_PATTERN,
+):
+    """try to figure out if value is valid or jinja2 template value
+
+    Args:
+        config (:obj:`configparser.ConfigParser`): config object to read key from
+        section (str): name of section in configparser
+        option (str): name of option in configparser
+        jinja_pattern (:obj:`_sre.SRE_Pattern`): a `re.compile()` pattern to match on
+
+    Returns:
+        str: value if value, else None
+
+    Raises:
+        KeyError:
+        configparser.NoOptionError:
+        configparser.NoSectionError:
+
+    """
+    value = config[section][option]
+    print(value)
+    print(re.match(jinja_pattern, str(value)))
+    if re.match(jinja_pattern, value):
+        return None
+
+    return value
 
 class ProsperConfig(object):
     """configuration handler for all prosper projects
@@ -160,7 +191,7 @@ class ProsperConfig(object):
 
         option = None
         try:
-            option = self.local_config[section_name][key_name]
+            option = check_value(self.local_config, section_name, key_name)
             self.logger.debug('-- using local config')
             if option:
                 return option
@@ -168,7 +199,7 @@ class ProsperConfig(object):
             self.logger.debug('`%s` not found in local config', section_info)
 
         try:
-            option = self.global_config[section_name][key_name]
+            option = check_value(self.global_config, section_name, key_name)
             self.logger.debug('-- using global config')
             if option:
                 return option

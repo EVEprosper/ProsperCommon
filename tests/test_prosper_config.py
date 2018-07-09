@@ -3,6 +3,7 @@
 Pytest functions for exercising prosper.common.prosper_config
 
 """
+import configparser
 import os
 from os import path
 import json
@@ -28,6 +29,22 @@ def test_setup_environment():
 
     expected_val = prosper_config.get_value_from_environment('TEST', 'dummy_val')
     assert expected_val == ENV_TEST_1
+
+def test_check_value():
+    """validate check_value happypath"""
+    config = prosper_config.read_config(path.join(HERE, 'test_config.cfg.j2'))
+
+    assert prosper_config.check_value(config, 'TEST', 'secret') == None
+    assert prosper_config.check_value(config, 'TEST', 'partial_secret') == None
+    assert prosper_config.check_value(config, 'TEST', 'key1') == 'vals'
+def test_skip_jinja():
+    """validate system treats jinja formatted blocks as blanks"""
+    config = prosper_config.ProsperConfig(path.join(HERE, 'test_config.cfg.j2'))
+
+    print(config.get_option('TEST', 'secret'))
+    assert config.get_option('TEST', 'secret') == None
+    assert config.get_option('TEST', 'partial_secret') == None
+    assert config.get_option('TEST', 'key1') == 'vals'
 
 def test_render_secrets():
     """happypath test for p_config.render_secrets"""
