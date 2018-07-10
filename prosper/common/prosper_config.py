@@ -8,11 +8,12 @@ from os import path, getenv
 import configparser
 from configparser import ExtendedInterpolation
 import logging
+import re
 
 import anyconfig
 import anytemplate
 
-
+JINJA_PATTERN = re.compile(r'.*{{\S*}}.*')
 def render_secrets(
         config_path,
         secret_path,
@@ -44,6 +45,34 @@ def render_secrets(
 
     return p_config
 
+def check_value(
+        config,
+        section,
+        option,
+        jinja_pattern=JINJA_PATTERN,
+):
+    """try to figure out if value is valid or jinja2 template value
+
+    Args:
+        config (:obj:`configparser.ConfigParser`): config object to read key from
+        section (str): name of section in configparser
+        option (str): name of option in configparser
+        jinja_pattern (:obj:`_sre.SRE_Pattern`): a `re.compile()` pattern to match on
+
+    Returns:
+        str: value if value, else None
+
+    Raises:
+        KeyError:
+        configparser.NoOptionError:
+        configparser.NoSectionError:
+
+    """
+    value = config[section][option]
+    if re.match(jinja_pattern, value):
+        return None
+
+    return value
 
 class ProsperConfig(object):
     """configuration handler for all prosper projects
@@ -57,8 +86,8 @@ class ProsperConfig(object):
     5. args_default -- function default w/o global config
 
     Args:
-        config_filename (str): path to config file
-        local_filepath_override (str): path modifier for private config file
+        config_filename (str): path to config
+        local_filepath_override (str, optional): path to alternate private config file
 
     Attributes:
         global_config (:obj:`configparser.ConfigParser`)
@@ -73,15 +102,6 @@ class ProsperConfig(object):
             config_filename,
             local_filepath_override='',
     ):
-        """get the config filename for initializing data structures
-
-        Args:
-            config_filename (str): path to config
-            local_filepath_override (str, optional): path to alternate private config file
-            logger (:obj:`logging.Logger`, optional): capture messages to logger
-            debug_mode (bool, optional): enable debug modes for config helper
-
-        """
         self.config_filename = config_filename
         self.local_config_filename = get_local_config_filepath(config_filename)
         if local_filepath_override:
@@ -104,7 +124,10 @@ class ProsperConfig(object):
             key_name (str): key name in config.section_name
 
         Returns:
-            (str): do not check defaults, only return local value
+            str: do not check defaults, only return local value
+
+        Raises:
+            KeyError: unable to find option in either local or global config
 
         """
         value = None
@@ -148,7 +171,7 @@ class ProsperConfig(object):
             args_default (any): arg default given by a function
 
         Returns:
-            (str) appropriate response as per priority order
+            str: appropriate response as per priority order
 
         """
         if args_option != args_default and\
@@ -160,7 +183,7 @@ class ProsperConfig(object):
 
         option = None
         try:
-            option = self.local_config[section_name][key_name]
+            option = check_value(self.local_config, section_name, key_name)
             self.logger.debug('-- using local config')
             if option:
                 return option
@@ -168,7 +191,7 @@ class ProsperConfig(object):
             self.logger.debug('`%s` not found in local config', section_info)
 
         try:
-            option = self.global_config[section_name][key_name]
+            option = check_value(self.global_config, section_name, key_name)
             self.logger.debug('-- using global config')
             if option:
                 return option
@@ -183,9 +206,6 @@ class ProsperConfig(object):
         self.logger.debug('-- using default argument')
         return args_default #If all esle fails return the given default
 
-    def attach_logger(self, logger):
-        """because load orders might be weird, add logger later"""
-        self.logger = logger
 
 ENVNAME_PAD = 'PROSPER'
 def get_value_from_environment(
@@ -252,9 +272,6 @@ def read_config(
         config_filepath (str): path to config file.  abspath > relpath
         logger (:obj:`logging.Logger`): logger to catch error msgs
 
-    Raises:
-        FileNotFound: file access issues
-
     """
     config_parser = configparser.ConfigParser(
         interpolation=ExtendedInterpolation(),
@@ -263,14 +280,9 @@ def read_config(
         inline_comment_prefixes=('#')
     )
     logger.debug('config_filepath=%s', config_filepath)
-    try:
-        with open(config_filepath, 'r') as filehandle:
-            config_parser.read_file(filehandle)
-    except Exception as error_msg:
-        logger.error(
-            'Unable to parse config file: %s', config_filepath, exc_info=True
-        )
-        raise error_msg
+
+    with open(config_filepath, 'r') as filehandle:
+        config_parser.read_file(filehandle)
 
     return config_parser
 
