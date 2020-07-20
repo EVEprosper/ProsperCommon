@@ -103,6 +103,8 @@ setup(
             'sphinx',
             'sphinxcontrib-napoleon',
             'tox-travis',
+            'tox',
+            'black',
         ],
     },
 )
