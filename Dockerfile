@@ -39,8 +39,10 @@ RUN apt-get update \
 ## https://www.liquidweb.com/kb/how-to-install-pyenv-on-ubuntu-18-04/ 
 RUN git clone https://github.com/pyenv/pyenv.git /opt/pyenv \
 	&& pyenv install $PYTHON_VERSION \
-	&& pyenv global $PYTHON_VERSION
+	&& pyenv install 3.7.8 \
+	&& pyenv install 3.6.11 
 
 COPY . $DEV_DIR/$PROJECT_NAME
 WORKDIR $DEV_DIR/$PROJECT_NAME
+RUN pyenv local $PYTHON_VERSION 3.7.8 3.6.11
 RUN pip3 install .[dev]

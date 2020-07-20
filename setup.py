@@ -103,6 +103,7 @@ setup(
             'sphinx',
             'sphinxcontrib-napoleon',
             'tox-travis',
+            'tox-pyenv',
             'tox',
             'black',
         ],
