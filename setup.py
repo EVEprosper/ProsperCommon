@@ -102,6 +102,7 @@ setup(
         'dev':[
             'sphinx',
             'sphinxcontrib-napoleon',
+            'tox-travis',
         ],
     },
 )

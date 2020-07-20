@@ -1,14 +1,12 @@
 language: python
 python:
-  #- "3.5"
-  - "3.6"
-  #- "3.6-dev" # 3.6 development branch
-  #- "3.7-dev" # 3.7 development branch
-install: 
-  - "pip install yolk3k"
-  - "pip install ."
+  - "3.6"      # current default Python on Travis CI
+  - "3.7"
+  - "3.8"
+  - "3.8-dev"
+install: pip install tox-travis
 script: 
-  - "python setup.py test"
+  - "tox"
 deploy:
   provider: pypi
   user: lockefox
