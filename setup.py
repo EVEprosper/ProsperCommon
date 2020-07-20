@@ -4,7 +4,6 @@ import importlib
 from os import path, listdir
 
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
 
 HERE = path.abspath(path.dirname(__file__))
 __package_name__ = 'ProsperCommon'
@@ -64,53 +63,6 @@ def include_all_subfiles(*args):
 
     return file_list
 
-class PyTest(TestCommand):
-    """PyTest cmdclass hook for test-at-buildtime functionality
-
-    http://doc.pytest.org/en/latest/goodpractices.html#manual-integration
-
-    """
-    user_options = [('pytest-args=', 'a', 'Arguments to pass to pytest')]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = [
-            'tests',
-            '-rx',
-            '-p',
-            'no:logging',
-            '--cov=prosper/' + __library_name__,
-            '--cov-report=term-missing',
-            '--cov-config=.coveragerc',
-        ]
-
-    def run_tests(self):
-        import shlex
-        import pytest
-        pytest_commands = []
-        try:
-            pytest_commands = shlex.split(self.pytest_args)
-        except AttributeError:
-            pytest_commands = self.pytest_args
-        errno = pytest.main(pytest_commands)
-        exit(errno)
-
-class QuietTest(PyTest):
-    """overrides to prevent webhook spam while developing"""
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = [
-            'tests',
-            '-rx',
-            '-p',
-            'no:logging',
-            '-m',
-            'not loud',
-            '--cov=prosper/' + __library_name__,
-            '--cov-report=term-missing',
-            '--cov-config=.coveragerc',
-        ]
-
 with open('README.rst', 'r', 'utf-8') as f:
     readme = f.read()
 
@@ -146,27 +98,10 @@ setup(
         'requests',
         'semantic_version',
     ],
-    tests_require=[
-        'pytest>=3.3.0',
-        'testfixtures',
-        'pytest_cov',
-        'mock',
-        'yolk3k',
-        'coverage',
-        'docker',
-    ],
     extras_require={
         'dev':[
             'sphinx',
             'sphinxcontrib-napoleon',
         ],
-        'test':[
-            'plumbum',
-            'docker',
-        ],
-    },
-    cmdclass={
-        'test':PyTest,
-        'quiet': QuietTest,
     },
 )
