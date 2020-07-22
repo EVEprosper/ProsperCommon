@@ -64,32 +64,32 @@ class ProsperApplication(cli.Application):
         """uses "global logger" for logging"""
         if self._logger:
             return self._logger
-        else:
-            log_builder = p_logging.ProsperLogger(
-                self.PROGNAME,
-                self.config.get_option('LOGGING', 'log_path'),
-                config_obj=self.config
-            )
 
-            if self.verbose:
-                log_builder.configure_debug_logger()
-            else:
-                id_string = '({platform}--{version})'.format(
-                    platform=platform.node(),
-                    version=self.VERSION
+        log_builder = p_logging.ProsperLogger(
+            self.PROGNAME,
+            self.config.get_option('LOGGING', 'log_path'),
+            config_obj=self.config
+        )
+
+        if self.verbose:
+            log_builder.configure_debug_logger()
+        else:
+            id_string = '({platform}--{version})'.format(
+                platform=platform.node(),
+                version=self.VERSION
+            )
+            if self.config.get_option('LOGGING', 'discord_webhook'):
+                log_builder.configure_discord_logger(
+                    custom_args=id_string
                 )
-                if self.config.get_option('LOGGING', 'discord_webhook'):
-                    log_builder.configure_discord_logger(
-                        custom_args=id_string
-                    )
-                if self.config.get_option('LOGGING', 'slack_webhook'):
-                    log_builder.configure_slack_logger(
-                        custom_args=id_string
-                    )
-                if self.config.get_option('LOGGING', 'hipchat_webhook'):
-                    log_builder.configure_hipchat_logger(
-                        custom_args=id_string
-                    )
+            if self.config.get_option('LOGGING', 'slack_webhook'):
+                log_builder.configure_slack_logger(
+                    custom_args=id_string
+                )
+            if self.config.get_option('LOGGING', 'hipchat_webhook'):
+                log_builder.configure_hipchat_logger(
+                    custom_args=id_string
+                )
 
             self._logger = log_builder.get_logger()
             return self._logger
